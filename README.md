@@ -1,19 +1,22 @@
 # 6S Binary Wrapper
 
-Convenience distribution  for building and installing a local 6S v1.1 executable.
+Convenience distribution for building and installing a local 6S v1.1 executable.
 
-## Installing
-To install this distribution alongside `rtm-wrapper`, enable the `6s` [extra](https://peps.python.org/pep-0508/#extras):
+## Install
+
+From git:
+```
+$ pip install 'sixs-bin @ git+https://github.com/brianschubert/sixs-bin'
+```
+
+From local source tree:
 ```shell
-$ pip install '.[6s]'  # in rtm-wrapper base directory
+$ pip install .
 ```
 
-To manually install just this distribution straight from git, run
-```
-$ pip install 'sixs-bin@git+https://github.com/brianschubert/rtm-wrapper.git#subdirectory=extra/sixs-bin'
-```
 
-## Testing
+
+## Test
 
 ```pycon
 >>> import sixs_bin
