@@ -32,7 +32,7 @@ line-length = 88
 # Don't skip skip temporary sanity checks.
 safe = true
 # Python versions that should be supported by Black's output.
-target-version = ["py310"]
+target-version = ["py39"]
 # Set to true to preview style changes that may be added in black's next major release.
 preview = false
 
