@@ -6,7 +6,7 @@ Convenience distribution for building and installing a local 6S v1.1 executable.
 
 From git:
 ```
-$ pip install 'sixs-bin @ git+https://github.com/brianschubert/sixs-bin'
+$ pip install '6s-bin @ git+https://github.com/brianschubert/6s-bin'
 ```
 
 From local source tree:

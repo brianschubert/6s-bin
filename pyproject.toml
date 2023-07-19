@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sixs-bin"
+name = "6s-bin"
 version = "0.1.0-dev"
 description = "Wrapper for a local 6S binary."
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
