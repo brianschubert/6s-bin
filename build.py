@@ -43,6 +43,8 @@ _SIXS_NAME: Final = pathlib.PurePath(urllib.parse.urlparse(_SIXS_URL).path).name
 # Expected SHA256 has of the 6S archive file.
 _SIXS_SHA256: Final = "eedf652e6743b3991b5b9e586da2f55c73f9c9148335a193396bf3893c2bc88f"
 
+# Name of compiled 6S v1.1 binary.
+_SIXS_BINARY: Final = "sixsV1.1"
 
 class BuildError(RuntimeError):
     """Raised on build failure."""
@@ -148,6 +150,12 @@ def _install(binary: pathlib.Path, target: pathlib.Path) -> None:
 
 def build(build_dir: pathlib.Path) -> None:
     """Run build in the given directory."""
+    binary_dest = _PACKAGE_ROOT.joinpath(_SIXS_BINARY)
+
+    if binary_dest.is_file():
+        # Binary already exists in package. Skip rebuilding.
+        print(f"target {binary_dest} already exists - skipping build")
+        return
 
     print(f"Downloading 6S archive from '{_SIXS_URL}' to '{build_dir}'")
     _download_sixs(build_dir)
@@ -182,7 +190,7 @@ def build(build_dir: pathlib.Path) -> None:
         ) from ex
 
     # Path to built binary.
-    sixs_binary = build_dir.joinpath("6SV1.1").joinpath("sixsV1.1")
+    sixs_binary = build_dir.joinpath("6SV1.1").joinpath(_SIXS_BINARY)
 
     # Validate built binary against example suite.
     print("Testing...")
@@ -190,7 +198,7 @@ def build(build_dir: pathlib.Path) -> None:
 
     # Install 6S executable into package source.
     print("Installing...")
-    _install(sixs_binary, _PACKAGE_ROOT / sixs_binary.name)
+    _install(sixs_binary, binary_dest)
 
 
 def main() -> None:
