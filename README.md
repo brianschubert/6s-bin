@@ -1,5 +1,8 @@
 # 6S Binary Wrapper
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
+
+
 Convenience distribution for building and installing a local [6S](https://salsa.umd.edu/6spage.html) v1.1 executable.
 
 ## Install
