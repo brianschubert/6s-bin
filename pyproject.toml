@@ -14,11 +14,15 @@ build = "build.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+py6s = { version = "^1.9.2", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
 isort = "^5.12.0"
 mypy = "^1.4.1"
+
+[tool.poetry.extras]
+wrapper = ["py6s"]
 
 [build-system]
 requires = ["poetry-core"]
