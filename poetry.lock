@@ -289,7 +289,10 @@ files = [
     {file = "typing_extensions-4.7.1.tar.gz", hash = "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"},
 ]
 
+[extras]
+wrapper = ["py6s"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "14c5d11d89bb4060ea79b95cc2e847b2ad5b9f725d7197332a3bf50d9be87816"
+content-hash = "264a016cb4b9f7e1f9cbfb28b01d393751c42ffd7d6e5ea6f55b2e8267585104"
