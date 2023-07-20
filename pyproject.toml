@@ -14,7 +14,9 @@ build = "build.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-py6s = { version = "^1.9.2", optional = true}
+py6s = { version = "^1.9.2", optional = true }
+# Undeclared dependency of Py6S
+python-dateutil = { version = "^2.8.2", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -23,7 +25,7 @@ mypy = "^1.4.1"
 pytest = "^7.4.0"
 
 [tool.poetry.extras]
-wrapper = ["py6s"]
+wrapper = ["py6s", "python-dateutil"]
 
 [build-system]
 requires = ["poetry-core"]
