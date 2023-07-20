@@ -1,6 +1,7 @@
 # Build and tooling artifacts
 /src/sixs_bin/sixsV1.1
 /dist/
+__pycache__/
 /.mypy_cache/
 /.pytest_cache
 
