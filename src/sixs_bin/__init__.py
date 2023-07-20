@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Final
 if TYPE_CHECKING:
     from Py6S import SixS
 
-__version__ = "0.1.0-dev"
+__version__ = "0.1.0"
 
 _RESOURCE_ROOT: Final[Traversable] = importlib.resources.files(__package__)
 
