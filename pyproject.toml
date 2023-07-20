@@ -14,7 +14,7 @@ build = "build.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-py6s = "^1.9.2"
+py6s = { version = "^1.9.2", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

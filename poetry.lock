@@ -162,7 +162,7 @@ files = [
 name = "numpy"
 version = "1.25.1"
 description = "Fundamental package for array computing in Python"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "numpy-1.25.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:77d339465dff3eb33c701430bcb9c325b60354698340229e1dff97745e6b3efa"},
@@ -248,7 +248,7 @@ testing = ["pytest", "pytest-benchmark"]
 name = "py6s"
 version = "1.9.2"
 description = "A wrapper for the 6S Radiative Transfer Model to make it easy to run simulations with a variety of input parameters, and to produce outputs in an easily processable form."
-optional = false
+optional = true
 python-versions = ">=3"
 files = [
     {file = "Py6S-1.9.2.tar.gz", hash = "sha256:2378ef027bbd3ead67cec47e9a14cf799b3bd851bc7833fbd44e2440666c0ff3"},
@@ -262,7 +262,7 @@ scipy = "*"
 name = "pysolar"
 version = "0.10"
 description = "Collection of Python libraries for simulating the irradiation of any point on earth by the sun"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "pysolar-0.10-py3-none-any.whl", hash = "sha256:99aa506d4eba41a83308a6772779ffcafcbe8afa595e80b8eafb1ed85b561446"},
@@ -295,7 +295,7 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 name = "scipy"
 version = "1.9.3"
 description = "Fundamental algorithms for scientific computing in Python"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "scipy-1.9.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1884b66a54887e21addf9c16fb588720a8309a57b2e258ae1c7986d4444d3bc0"},
@@ -352,9 +352,9 @@ files = [
 ]
 
 [extras]
-wrapper = ["py6s"]
+wrapper = []
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "612a7e8e4dda0832df1a65c85c05ae6bd197a55cbb45751a6e67fd964bde9189"
+content-hash = "eac30cceaac003cd8ecc17d74aeb817e0e2a98a270eac53a6877069437474dea"
