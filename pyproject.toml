@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "6s-bin"
-version = "0.3.0"
+version = "0.4.0-dev"
 description = "Wrapper for a local 6S binary."
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
 readme = "README.md"
