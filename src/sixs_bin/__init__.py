@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.resources
+import importlib.metadata
 import pathlib
 from importlib.abc import Traversable
 from typing import TYPE_CHECKING, Final
@@ -9,7 +10,7 @@ from typing import TYPE_CHECKING, Final
 if TYPE_CHECKING:
     from Py6S import SixS
 
-__version__ = "0.3.0-dev"
+__version__ = importlib.metadata.version("6s-bin")
 
 _RESOURCE_ROOT: Final[Traversable] = importlib.resources.files(__package__)
 
