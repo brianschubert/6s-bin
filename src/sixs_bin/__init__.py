@@ -17,8 +17,8 @@ Wrapper for a local 6S binary.
 
 from __future__ import annotations
 
-import importlib.resources
 import importlib.metadata
+import importlib.resources
 import pathlib
 from importlib.abc import Traversable
 from typing import TYPE_CHECKING, Final
@@ -27,7 +27,9 @@ from typing import TYPE_CHECKING, Final
 if TYPE_CHECKING:
     from Py6S import SixS
 
-__version__ = importlib.metadata.version("6s-bin")
+DISTRIBUTION_NAME: Final[str] = "6s-bin"
+
+__version__ = importlib.metadata.version(DISTRIBUTION_NAME)
 
 _RESOURCE_ROOT: Final[Traversable] = importlib.resources.files(__package__)
 
@@ -50,7 +52,7 @@ def _import_wrapper() -> type[SixS]:
     except ImportError as ex:
         raise ImportError(
             f"Unable to import Py6S. Make sure it's installed. "
-            f"Install 6s-bin with the [wrapper] extra enabled to install "
+            f"Install {DISTRIBUTION_NAME} with the [wrapper] extra enabled to install "
             f"Py6S automatically."
         ) from ex
     return SixS  # type: ignore
