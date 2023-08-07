@@ -221,6 +221,7 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
         subprocess.run(
             [
                 "make",
+                "-j",
                 "sixs",
                 unix_arg if not _is_windows() else "",
             ],
