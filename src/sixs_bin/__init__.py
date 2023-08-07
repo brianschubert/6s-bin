@@ -43,7 +43,7 @@ _SIXS_BINARIES: Final[dict[SixSVersion, Traversable]] = {
 __version__ = importlib.metadata.version(DISTRIBUTION_NAME)
 
 
-def get_path(version: SixSVersion = "1.1") -> pathlib.Path:
+def get_path(version: SixSVersion) -> pathlib.Path:
     """Retrieve the path to a 6S executable from this package's resources."""
 
     try:
