@@ -6,6 +6,20 @@ resource.
 
 https://py6s.readthedocs.io/en/latest/installation.html#installing-6s
 """
+# Copyright (C) 2023 Brian Schubert.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from __future__ import annotations
 
 import difflib
@@ -24,63 +38,90 @@ import tempfile
 import textwrap
 import urllib.parse
 import urllib.request
-from typing import Final
+from typing import Final, NamedTuple
 
 # Build script is always invoked from the base directory of the current distribution.
-_DISTRIBUTION_ROOT: Final = pathlib.Path.cwd()
-_PACKAGE_ROOT: Final = _DISTRIBUTION_ROOT / "src" / "sixs_bin"
+DISTRIBUTION_ROOT: Final = pathlib.Path.cwd()
+PACKAGE_ROOT: Final = DISTRIBUTION_ROOT / "src" / "sixs_bin"
 
-# URL to obtain 6S archive from. Alternatively, place 6SV-1.1.tar in the distribution
-# base directory to avoid downloading a new copy.
-# From Py6S author's website.
-# _SIXS_URL: Final = "https://rtwilson.com/downloads/6SV-1.1.tar"
-# Mirror from archive.org snapshot.
-_SIXS_URL: Final = "https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar"
-
-# Name of 6S archive file.
-_SIXS_NAME: Final = pathlib.PurePath(urllib.parse.urlparse(_SIXS_URL).path).name
-
-# Expected SHA256 has of the 6S archive file.
-_SIXS_SHA256: Final = "eedf652e6743b3991b5b9e586da2f55c73f9c9148335a193396bf3893c2bc88f"
-
-# Name of compiled 6S v1.1 binary.
-_SIXS_BINARY: Final = "sixsV1.1"
 
 class BuildError(RuntimeError):
     """Raised on build failure."""
 
 
+class SixSTarget(NamedTuple):
+    target_name: str
+    "Name of this target's compiled 6S binary"
+
+    archive_url: str
+    """
+    URL to obtain 6S source archive from. 
+    
+    To avoid downloading a new copy, place the archive file in the distribution 
+    base directory.
+    """
+
+    archive_sha256: str
+    """Expected SHA256 has of the 6S archive file as a 64-character hexstring."""
+
+    @property
+    def archive_name(self) -> str:
+        return pathlib.PurePath(urllib.parse.urlparse(self.archive_url).path).name
+
+    def download_source(self, directory: pathlib.Path) -> None:
+        """
+        Download, validate, and extract this 6S target's source archive into
+        the given directory.
+        """
+        develop_sixs_cache = DISTRIBUTION_ROOT.joinpath(self.archive_name)
+        if develop_sixs_cache.exists():
+            sixs_archive = develop_sixs_cache.read_bytes()
+        else:
+            response: http.client.HTTPResponse = urllib.request.urlopen(
+                self.archive_url
+            )
+            if response.status != http.HTTPStatus.OK.value:
+                raise BuildError(
+                    f"failed to download 6S archive - got response "
+                    f"{response.status} {response.reason}"
+                )
+            sixs_archive = response.read()
+
+        digest = hashlib.sha256(sixs_archive).hexdigest()
+        if digest != self.archive_sha256:
+            raise RuntimeError(
+                f"6S archive hash validation failed. "
+                f"Expected SHA256={self.archive_sha256}, got SHA256={digest}"
+            )
+
+        buffer = io.BytesIO(sixs_archive)
+        tar_file = tarfile.open(fileobj=buffer, mode="r:")
+        tar_file.extractall(directory)
+
+
+TARGETS: Final = [
+    SixSTarget(
+        target_name="sixsV1.1",
+        # From Py6S author's website.
+        # archive_url = "https://rtwilson.com/downloads/6SV-1.1.tar",
+        # Mirror from archive.org snapshot.
+        archive_url="https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar",
+        archive_sha256="eedf652e6743b3991b5b9e586da2f55c73f9c9148335a193396bf3893c2bc88f",
+    ),
+    SixSTarget(
+        target_name="sixsV2.1",
+        # From SALSA website.
+        # archive_url="https://salsa.umd.edu/files/6S/6sV2.1.tar",
+        # Mirror from archive.org snapshot.
+        archive_url="https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar",
+        archive_sha256="42422db29c095a49eaa98556b416405eb818be1ee30139d2a1913dbf3b0c7de1",
+    ),
+]
+
+
 def _is_windows() -> bool:
     """Return True if the current platform is Windows."""
     return sys.platform == "win32"
-
-
-def _download_sixs(directory: pathlib.Path) -> None:
-    """
-    Download, validate, and extract 6S into the given directory.
-    """
-    develop_sixs_cache = _DISTRIBUTION_ROOT.joinpath(_SIXS_NAME)
-    if develop_sixs_cache.exists():
-        sixs_archive = develop_sixs_cache.read_bytes()
-    else:
-        response: http.client.HTTPResponse = urllib.request.urlopen(_SIXS_URL)
-        if response.status != http.HTTPStatus.OK.value:
-            raise BuildError(
-                f"failed to download 6S archive - got response "
-                f"{response.status} {response.reason}"
-            )
-        sixs_archive = response.read()
-
-    digest = hashlib.sha256(sixs_archive).hexdigest()
-    if digest != _SIXS_SHA256:
-        raise RuntimeError(
-            f"6S archive hash validation failed. "
-            f"Expected SHA256={_SIXS_SHA256}, got SHA256={digest}"
-        )
-
-    buffer = io.BytesIO(sixs_archive)
-    tar_file = tarfile.open(fileobj=buffer, mode="r:")
-    tar_file.extractall(directory)
 
 
 def _assert_detect_command(cmd: list[str]) -> None:
@@ -148,36 +189,43 @@ def _install(binary: pathlib.Path, target: pathlib.Path) -> None:
     os.chmod(target, target.stat().st_mode | stat.S_IXUSR)
 
 
-def build(build_dir: pathlib.Path) -> None:
+def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
     """Run build in the given directory."""
-    binary_dest = _PACKAGE_ROOT.joinpath(_SIXS_BINARY)
+    binary_dest = PACKAGE_ROOT.joinpath(target.target_name)
 
     if binary_dest.is_file():
         # Binary already exists in package. Skip rebuilding.
         print(f"target {binary_dest} already exists - skipping build")
         return
 
-    print(f"Downloading 6S archive from '{_SIXS_URL}' to '{build_dir}'")
-    _download_sixs(build_dir)
+    print(f"Downloading 6S archive from '{target.archive_url}' to '{build_dir}'")
+    target.download_source(build_dir)
     # Print extracted files for debugging.
     # for p in sorted(build_dir.glob("**/*")):
     #     print(f"file: {p}")
 
-    # Check system dependencies
-    _assert_detect_command(["make", "--version"])
-    _assert_detect_command(["gfortran", "--version"])
-
     # Make 6S executable.
     print("Building...")
+    try:
+        # If 6S source contains a directory beginning with 6S, build from that directory.
+        (src_dir,) = build_dir.glob("6S*")
+    except (FileNotFoundError, ValueError):
+        # No 6S* subdirectory. Build from source root.
+        src_dir = build_dir
+
+    if not src_dir.joinpath("Makefile").exists():
+        raise BuildError(f"could not find Makefile in source directory '{src_dir}'")
+
     try:
         unix_arg = "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)"
         subprocess.run(
             [
                 "make",
+                "-j",
                 "sixs",
                 unix_arg if not _is_windows() else "",
             ],
-            cwd=build_dir.joinpath("6SV1.1"),
+            cwd=src_dir,
             capture_output=True,
             check=True,
             text=True,
@@ -190,11 +238,15 @@ def build(build_dir: pathlib.Path) -> None:
         ) from ex
 
     # Path to built binary.
-    sixs_binary = build_dir.joinpath("6SV1.1").joinpath(_SIXS_BINARY)
+    sixs_binary = src_dir.joinpath(target.target_name)
 
     # Validate built binary against example suite.
-    print("Testing...")
-    _test_sixs(sixs_binary, build_dir.joinpath("Examples"))
+    example_dir = build_dir.joinpath("Examples")
+    if example_dir.exists():
+        print("Testing...")
+        _test_sixs(sixs_binary, build_dir.joinpath("Examples"))
+    else:
+        print("Skipping tests - no examples found")
 
     # Install 6S executable into package source.
     print("Installing...")
@@ -203,8 +255,17 @@ def build(build_dir: pathlib.Path) -> None:
 
 def main() -> None:
     """Build script entrypoint."""
-    with tempfile.TemporaryDirectory() as build_dir:
-        build(pathlib.Path(build_dir))
+
+    # Check system dependencies
+    print("Checking system dependencies...")
+    _assert_detect_command(["make", "--version"])
+    _assert_detect_command(["gfortran", "--version"])
+
+    # Build each 6S target.
+    for target in TARGETS:
+        print(f"target: {target.target_name}")
+        with tempfile.TemporaryDirectory() as build_dir:
+            build(target, pathlib.Path(build_dir))
 
 
 if __name__ == "__main__":

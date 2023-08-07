@@ -382,4 +382,4 @@ wrapper = ["py6s", "python-dateutil"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "c334912daf3c8b10124d8cde547d0f4979bd665cbdf2a7e2ea0812f2027fd35c"
+content-hash = "fa0a24c77138d004c7553e1aef1047cede4e58c19f1ea71cf39aa091d9a49978"

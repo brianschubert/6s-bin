@@ -1,12 +1,14 @@
 # Build and tooling artifacts
-/src/sixs_bin/sixsV1.1
-/dist/
 __pycache__/
+/dist/
 /.mypy_cache/
-/.pytest_cache
+/.pytest_cache/
+
+# Packaged 6S binaries
+/src/sixs_bin/sixsV*
 
 # IDEs
-/.idea
+/.idea/
 
-# Cache of 6s archive for development.
-/6SV-1.1.tar
+# Cached 6S archives used for development
+/6[Ss]*.tar

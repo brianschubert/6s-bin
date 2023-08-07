@@ -1,30 +1,76 @@
+"""
+Wrapper for local 6S binaries.
+"""
+# Copyright (C) 2023 Brian Schubert.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from __future__ import annotations
 
-import importlib.resources
 import importlib.metadata
+import importlib.resources
 import pathlib
 from importlib.abc import Traversable
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Literal
+
+from typing_extensions import TypeAlias
 
 # Py6S may not be installed.
 if TYPE_CHECKING:
     from Py6S import SixS
 
-__version__ = importlib.metadata.version("6s-bin")
+SixSVersion: TypeAlias = Literal["1.1", "2.1"]
+
+DISTRIBUTION_NAME: Final[str] = "6s-bin"
 
 _RESOURCE_ROOT: Final[Traversable] = importlib.resources.files(__package__)
 
-_SIXS_BIN: Final[Traversable] = _RESOURCE_ROOT / f"sixsV1.1"
+_SIXS_BINARIES: Final[dict[SixSVersion, Traversable]] = {
+    "1.1": _RESOURCE_ROOT / "sixsV1.1",
+    "2.1": _RESOURCE_ROOT / "sixsV2.1",
+}
+
+__version__ = importlib.metadata.version(DISTRIBUTION_NAME)
 
 
-def sixs_bin() -> pathlib.Path:
-    """Retrieve the path to the 6S executable from this package's resources."""
-    if not isinstance(_SIXS_BIN, pathlib.Path):
+def get_path(version: SixSVersion) -> pathlib.Path:
+    """Retrieve the path to a 6S executable from this package's resources."""
+
+    try:
+        binary = _SIXS_BINARIES[version]
+    except KeyError as ex:
+        raise ValueError(
+            f"invalid 6S version '{version}' - must be one of {list(_SIXS_BINARIES.keys())}"
+        ) from ex
+
+    if not isinstance(binary, pathlib.Path):
         raise RuntimeError(
-            f"6S binary package resource represented as non-path resource: {_SIXS_BIN}"
+            f"6S binary package resource represented as non-path resource: {binary}"
         )
 
-    return _SIXS_BIN
+    return binary
+
+
+def make_wrapper(version: SixSVersion = "1.1") -> SixS:
+    """
+    Create ``Py6s.SixS`` wrapper instance using the specified 6S executable.
+
+    Defaults to 6S v1.1. Currently, this is the only version that Py6S supports.
+
+    Requires ``Py6S`` to be installed.
+    """
+    wrapper_class = _import_wrapper()
+    return wrapper_class(get_path(version))
 
 
 def _import_wrapper() -> type[SixS]:
@@ -33,27 +79,7 @@ def _import_wrapper() -> type[SixS]:
     except ImportError as ex:
         raise ImportError(
             f"Unable to import Py6S. Make sure it's installed. "
-            f"Install 6s-bin with the [wrapper] extra enabled to install "
+            f"Install {DISTRIBUTION_NAME} with the [wrapper] extra enabled to install "
             f"Py6S automatically."
         ) from ex
     return SixS  # type: ignore
-
-
-def make_wrapper() -> SixS:
-    """
-    Create ``Py6s.SixS`` wrapper instance using this package's 6S executable.
-
-    Requires ``Py6S`` to be installed.
-    """
-    wrapper_class = _import_wrapper()
-    return wrapper_class(sixs_bin())
-
-
-def test_wrapper() -> None:
-    """
-    Run ``Py6s.SixS.text`` using this package's 6S executable.
-
-    Requires ``Py6S`` to be installed.
-    """
-    wrapper_class = _import_wrapper()
-    wrapper_class.test(sixs_bin())
