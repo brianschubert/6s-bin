@@ -10,5 +10,7 @@ def test_get_path() -> None:
 
 
 def test_wrapper() -> None:
-    _ = pytest.importorskip("Py6S")
-    sixs_bin.test_wrappers()
+    Py6S = pytest.importorskip("Py6S")
+
+    wrapper = sixs_bin.make_wrapper()
+    Py6S.SixS.test(wrapper.sixs_path)

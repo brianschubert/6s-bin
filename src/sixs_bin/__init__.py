@@ -63,23 +63,14 @@ def get_path(version: SixSVersion) -> pathlib.Path:
 
 def make_wrapper(version: SixSVersion = "1.1") -> SixS:
     """
-    Create ``Py6s.SixS`` wrapper instance using this specified 6S executable.
+    Create ``Py6s.SixS`` wrapper instance using the specified 6S executable.
+
+    Defaults to 6S v1.1. Currently, this is the only version that Py6S supports.
 
     Requires ``Py6S`` to be installed.
     """
     wrapper_class = _import_wrapper()
     return wrapper_class(get_path(version))
-
-
-def test_wrappers() -> None:
-    """
-    Run ``Py6s.SixS.test`` with each of this package's 6S executables.
-
-    Requires ``Py6S`` to be installed.
-    """
-    for binary in _SIXS_BINARIES.values():
-        wrapper_class = _import_wrapper()
-        wrapper_class.test(binary)
 
 
 def _import_wrapper() -> type[SixS]:
