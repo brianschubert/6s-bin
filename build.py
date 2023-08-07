@@ -73,7 +73,7 @@ class SixSTarget(NamedTuple):
         Download, validate, and extract this 6S target's source archive into
         the given directory.
         """
-        develop_sixs_cache = DISTRIBUTION_ROOT.joinpath(self.target_name)
+        develop_sixs_cache = DISTRIBUTION_ROOT.joinpath(self.archive_name)
         if develop_sixs_cache.exists():
             sixs_archive = develop_sixs_cache.read_bytes()
         else:
