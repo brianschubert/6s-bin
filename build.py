@@ -60,6 +60,7 @@ _SIXS_SHA256: Final = "eedf652e6743b3991b5b9e586da2f55c73f9c9148335a193396bf3893
 # Name of compiled 6S v1.1 binary.
 _SIXS_BINARY: Final = "sixsV1.1"
 
+
 class BuildError(RuntimeError):
     """Raised on build failure."""
 
