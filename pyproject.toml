@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "6s-bin"
 version = "0.4.0-dev"
-description = "Wrapper for a local 6S binary."
+description = "Convenience distribution for building and installing local 6S executables."
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
 readme = "README.md"
