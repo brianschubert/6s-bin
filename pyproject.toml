@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "6s-bin"
 version = "0.4.0-dev"
-description = "Wrapper for a local 6S binary."
+description = "Convenience distribution for building and installing local 6S executables."
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
 readme = "README.md"
@@ -15,6 +15,7 @@ build = "build.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+typing-extensions = "^4.7.1"
 py6s = { version = "^1.9.2", optional = true }
 # Undeclared dependency of Py6S
 python-dateutil = { version = "^2.8.2", optional = true }
