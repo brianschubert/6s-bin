@@ -108,6 +108,14 @@ TARGETS: Final = [
         archive_url="https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar",
         archive_sha256="eedf652e6743b3991b5b9e586da2f55c73f9c9148335a193396bf3893c2bc88f",
     ),
+    SixSTarget(
+        target_name="sixsV2.1",
+        # From SALSA website.
+        # archive_url="https://salsa.umd.edu/files/6S/6sV2.1.tar",
+        # Mirror from archive.org snapshot.
+        archive_url="https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar",
+        archive_sha256="42422db29c095a49eaa98556b416405eb818be1ee30139d2a1913dbf3b0c7de1",
+    ),
 ]
 
 
