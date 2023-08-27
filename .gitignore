@@ -12,3 +12,6 @@ __pycache__/
 
 # Cached 6S archives used for development
 /6[Ss]*.tar
+
+# Misc.
+/.local/
