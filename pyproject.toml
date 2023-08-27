@@ -5,6 +5,13 @@ description = "Convenience distribution for building and installing local 6S exe
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
 readme = "README.md"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Fortran", # Requires Fortran 77 compiler to build wheels.
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Typing :: Typed",
+]
 packages = [
     { from = "src", include = "sixs_bin" }
 ]
