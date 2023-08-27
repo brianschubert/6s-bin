@@ -9,7 +9,8 @@ packages = [
     { from = "src", include = "sixs_bin" }
 ]
 include = [
-    "src/sixs_bin/sixsV1.1"
+    "src/sixs_bin/sixsV1.1",
+    "src/sixs_bin/sixsV2.1",
 ]
 build = "build.py"
 
