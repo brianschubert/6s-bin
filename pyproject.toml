@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "6s-bin"
-version = "0.4.1"
+version = "0.4.2"
 description = "Convenience distribution for building and installing local 6S executables."
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
@@ -9,7 +9,8 @@ packages = [
     { from = "src", include = "sixs_bin" }
 ]
 include = [
-    "src/sixs_bin/sixsV1.1"
+    "src/sixs_bin/sixsV1.1",
+    "src/sixs_bin/sixsV2.1",
 ]
 build = "build.py"
 
