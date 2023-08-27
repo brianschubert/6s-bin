@@ -1,5 +1,7 @@
+import pathlib
 import re
 import subprocess
+from collections.abc import Iterable
 from typing import Final
 
 import pytest
@@ -30,63 +32,65 @@ INPUT_FILE: Final = """\
 """
 
 
-def test_get_path() -> None:
+def sixs_binaries() -> Iterable[pathlib.Path]:
     for version in sixs_bin._SIXS_BINARIES.keys():
-        binary = sixs_bin.get_path(version)
-        assert binary.is_file()
+        yield sixs_bin.get_path(version)
 
 
-def test_basic_run() -> None:
-    for version in sixs_bin._SIXS_BINARIES.keys():
-        binary = sixs_bin.get_path(version)
+@pytest.mark.parametrize("binary", sixs_binaries(), ids=lambda p: p.name)
+def test_get_path(binary) -> None:
+    assert binary.is_file()
 
-        result = subprocess.run(
-            [binary],
-            input=INPUT_FILE,
-            capture_output=True,
-            check=True,
-            text=True,
-            encoding="ascii",
+
+@pytest.mark.parametrize("binary", sixs_binaries(), ids=lambda p: p.name)
+def test_basic_run(binary) -> None:
+    result = subprocess.run(
+        [binary],
+        input=INPUT_FILE,
+        capture_output=True,
+        check=True,
+        text=True,
+        encoding="ascii",
+    )
+    output_lines = result.stdout.strip().splitlines()
+
+    # Verify that 6S version indicated in output matches the expected binary version.
+    version_match = re.match(
+        r"^\*+ 6SV version ([\w.]+) \*+$", output_lines[0], flags=re.ASCII
+    )
+    if version_match is None:
+        pytest.fail(
+            f"6S malformed output - could not find version in first"
+            f" non-whitespace output line: '{output_lines[0]}'"
         )
-        output_lines = result.stdout.strip().splitlines()
+    assert version_match.group(1) == binary.name[5:]
 
-        # Verify that 6S version indicated in output matches the expected binary version.
-        version_match = re.match(
-            r"^\*+ 6SV version ([\w.]+) \*+$", output_lines[0], flags=re.ASCII
+    # Check a single line in the output.
+
+    gas_marker = "global gas. trans."
+    for line in result.stdout.strip().splitlines():
+        if gas_marker in line:
+            gas_line = line
+            break
+    else:
+        pytest.fail(
+            f"6S output malformed - could not find line containing {gas_marker} line"
         )
-        if version_match is None:
-            pytest.fail(
-                f"6S malformed output - could not find version in first"
-                f" non-whitespace output line: '{output_lines[0]}'"
-            )
-        assert version_match.group(1) == binary.name[5:]
 
-        # Check a single line in the output.
+    # Extract global gas transmittance values.
+    gas_match = re.match(
+        r"^\*[^:]+:\s+(\d+.\d+)\s+(\d+.\d+)\s+(\d+.\d+)\s+\*$",
+        gas_line,
+        flags=re.ASCII,
+    )
+    if gas_match is None:
+        pytest.fail(f"6S output malformed - line has bad format: '{gas_line}'")
+    downward, upward, total = gas_match.groups()
 
-        gas_marker = "global gas. trans."
-        for line in result.stdout.strip().splitlines():
-            if gas_marker in line:
-                gas_line = line
-                break
-        else:
-            pytest.fail(
-                f"6S output malformed - could not find line containing {gas_marker} line"
-            )
-
-        # Extract global gas transmittance values.
-        gas_match = re.match(
-            r"^\*[^:]+:\s+(\d+.\d+)\s+(\d+.\d+)\s+(\d+.\d+)\s+\*$",
-            gas_line,
-            flags=re.ASCII,
-        )
-        if gas_match is None:
-            pytest.fail(f"6S output malformed - line has bad format: '{gas_line}'")
-        downward, upward, total = gas_match.groups()
-
-        # Expected output values for sample input from 6S user guide.
-        assert downward == "0.68965"
-        assert upward == "0.97248"
-        assert total == "0.67513"
+    # Expected output values for sample input from 6S user guide.
+    assert downward == "0.68965"
+    assert upward == "0.97248"
+    assert total == "0.67513"
 
 
 def test_wrapper() -> None:
