@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
+      fail-fast: true
       matrix:
         python-version: [ "3.9", "3.10", "3.11" ]
     steps:
