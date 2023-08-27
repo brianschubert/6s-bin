@@ -22,4 +22,4 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install .'[wrapper]' pytest
       - name: Run pytest
-        run: python -m pytest
+        run: python -m pytest -vv
