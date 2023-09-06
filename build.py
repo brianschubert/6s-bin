@@ -119,9 +119,9 @@ TARGETS: Final = [
 ]
 
 
-def _is_windows() -> bool:
-    """Return True if the current platform is Windows."""
-    return sys.platform == "win32"
+# def _is_windows() -> bool:
+#     """Return True if the current platform is Windows."""
+#     return sys.platform == "win32"
 
 
 def _assert_detect_command(cmd: list[str]) -> None:
@@ -217,13 +217,12 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
         raise BuildError(f"could not find Makefile in source directory '{src_dir}'")
 
     try:
-        unix_arg = "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)"
         subprocess.run(
             [
                 "make",
                 "-j",
                 "sixs",
-                unix_arg if not _is_windows() else "",
+                "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)",
             ],
             cwd=src_dir,
             capture_output=True,
