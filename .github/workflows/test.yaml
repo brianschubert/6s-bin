@@ -40,6 +40,9 @@ jobs:
       - name: Install system dependencies
         run: |
           brew install gfortran make
+          type -a gfortran
+          type -a gcc
+          echo $PATH
       - name: Install package and test dependencies
         run: |
           python -m pip install --upgrade pip
