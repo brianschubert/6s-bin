@@ -37,12 +37,10 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install system dependencies
+      - uses: awvwgk/setup-fortran@v1
+      - name: Install make
         run: |
-          brew install gfortran make
-          ls -laF /usr/local/opt/make/libexec/gnubin
-          type -a gcc
-          echo $PATH
+          brew install make
       - name: Install package and test dependencies
         run: |
           python -m pip install --upgrade pip
