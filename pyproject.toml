@@ -19,7 +19,12 @@ include = [
     "src/sixs_bin/sixsV1.1",
     "src/sixs_bin/sixsV2.1",
 ]
-build = "build.py"
+
+[tool.poetry.build]
+# Note: custom build scripts are currently an undocummented feature of poetry.
+# See https://github.com/python-poetry/poetry/issues/2740.
+script = "build.py"
+generate-setup-file = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
