@@ -43,6 +43,9 @@ from typing import Final, NamedTuple
 DISTRIBUTION_ROOT: Final = pathlib.Path.cwd()
 PACKAGE_ROOT: Final = DISTRIBUTION_ROOT / "src" / "sixs_bin"
 
+# Environment variable for specifying a cache directory of 6S source archives.
+ARCHIVE_CACHE_ENV: Final = "SIXS_ARCHIVE_DIR"
+
 
 class BuildError(RuntimeError):
     """Raised on build failure."""
@@ -66,36 +69,6 @@ class SixSTarget(NamedTuple):
     @property
     def archive_name(self) -> str:
         return pathlib.PurePath(urllib.parse.urlparse(self.archive_url).path).name
-
-    def download_source(self, directory: pathlib.Path) -> None:
-        """
-        Download, validate, and extract this 6S target's source archive into
-        the given directory.
-        """
-        develop_sixs_cache = DISTRIBUTION_ROOT.joinpath(self.archive_name)
-        if develop_sixs_cache.exists():
-            sixs_archive = develop_sixs_cache.read_bytes()
-        else:
-            response: http.client.HTTPResponse = urllib.request.urlopen(
-                self.archive_url
-            )
-            if response.status != http.HTTPStatus.OK.value:
-                raise BuildError(
-                    f"failed to download 6S archive - got response "
-                    f"{response.status} {response.reason}"
-                )
-            sixs_archive = response.read()
-
-        digest = hashlib.sha256(sixs_archive).hexdigest()
-        if digest != self.archive_sha256:
-            raise RuntimeError(
-                f"6S archive hash validation failed. "
-                f"Expected SHA256={self.archive_sha256}, got SHA256={digest}"
-            )
-
-        buffer = io.BytesIO(sixs_archive)
-        tar_file = tarfile.open(fileobj=buffer, mode="r:")
-        tar_file.extractall(directory)
 
 
 TARGETS: Final = [
@@ -130,6 +103,53 @@ def _assert_detect_command(cmd: list[str]) -> None:
     except (FileNotFoundError, subprocess.CalledProcessError) as ex:
         raise BuildError(f"unable to run {prog}") from ex
     print(f"detected {prog}:\n{textwrap.indent(result.stdout, '.. ')}", end="")
+
+
+def _resolve_source(target: SixSTarget, directory: pathlib.Path):
+    """
+    Locate or download the given 6S target's source archive, validate it, and extract it
+    to the specified directory.
+
+    Raises ``BuildError`` on download or validation failure.
+    """
+
+    archive_directory = os.environ.get(ARCHIVE_CACHE_ENV)
+
+    if (
+        archive_directory is not None
+        and (
+            archive_path := pathlib.Path(archive_directory).joinpath(
+                target.archive_name
+            )
+        ).exists()
+    ):
+        print(f"Using cached source '{archive_path}'")
+
+        sixs_archive = archive_path.read_bytes()
+
+    else:
+        # No cached source - download fresh copy.
+        print(f"Downloading 6S archive from '{target.archive_url}'")
+
+        response: http.client.HTTPResponse = urllib.request.urlopen(target.archive_url)
+        if response.status != http.HTTPStatus.OK.value:
+            raise BuildError(
+                f"failed to download 6S archive - got response "
+                f"{response.status} {response.reason}"
+            )
+        sixs_archive = response.read()
+
+    digest = hashlib.sha256(sixs_archive).hexdigest()
+    if digest != target.archive_sha256:
+        raise RuntimeError(
+            f"6S archive hash validation failed. "
+            f"Expected SHA256={target.archive_sha256}, got SHA256={digest}"
+        )
+
+    print(f"Extracting source to '{directory}'")
+    buffer = io.BytesIO(sixs_archive)
+    tar_file = tarfile.open(fileobj=buffer, mode="r:")
+    tar_file.extractall(directory)
 
 
 def _test_sixs(binary: pathlib.Path, example_dir: pathlib.Path) -> None:
@@ -192,8 +212,8 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
         print(f"target {binary_dest} already exists - skipping build")
         return
 
-    print(f"Downloading 6S archive from '{target.archive_url}' to '{build_dir}'")
-    target.download_source(build_dir)
+    print(f"Resolving 6S source...")
+    _resolve_source(target, build_dir)
     # Print extracted files for debugging.
     # for p in sorted(build_dir.glob("**/*")):
     #     print(f"file: {p}")
