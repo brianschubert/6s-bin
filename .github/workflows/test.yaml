@@ -40,7 +40,7 @@ jobs:
       - name: Install system dependencies
         run: |
           brew install gfortran make
-          type -a gfortran
+          ls -laF /usr/local/opt/make/libexec/gnubin
           type -a gcc
           echo $PATH
       - name: Install package and test dependencies
