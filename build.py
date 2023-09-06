@@ -216,15 +216,13 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
     if not src_dir.joinpath("Makefile").exists():
         raise BuildError(f"could not find Makefile in source directory '{src_dir}'")
 
-    try:
+    make_command = ["make", "-j", "sixs"]
+    if not _is_windows():
         unix_arg = "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)"
+        make_command.append(unix_arg)
+    try:
         subprocess.run(
-            [
-                "make",
-                "-j",
-                "sixs",
-                unix_arg if not _is_windows() else "",
-            ],
+            make_command,
             cwd=src_dir,
             capture_output=True,
             check=True,
