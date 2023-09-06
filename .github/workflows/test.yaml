@@ -1,6 +1,9 @@
 name: Tests
 
-on: [ push ]
+on:
+  push:
+    branches:
+      - '!feat/release-github-action'
 
 jobs:
   test:
