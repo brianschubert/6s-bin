@@ -6,7 +6,7 @@ on:
       - feat/release-github-action
 
 jobs:
-  test:
+  build:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     strategy:
