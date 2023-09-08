@@ -9,10 +9,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
-        python-version: [ "3.9","3.10", "3.11" ]
+        os: [ "windows-latest", "ubuntu-latest" ]
+        python-version: [ "3.11" ]
+#        os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
+#        python-version: [ "3.9","3.10", "3.11" ]
     steps:
       - uses: actions/checkout@v3
+
+      - uses: ./.github/workflows/download_cache.yaml
+        with:
+          path: sixs_source_archives
+          urls: |
+            [
+              "https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar",
+              "https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar"
+            ]
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4

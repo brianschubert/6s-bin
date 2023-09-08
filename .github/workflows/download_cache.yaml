@@ -1,0 +1,29 @@
+name: Download and cache
+
+on:
+  workflow_call:
+    inputs:
+      urls:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        url: ${{ fromJSON(github.event.inputs.urls) }}
+    steps:
+      - name: Download file
+        run:
+          curl --create-dirs --output-dir ${{ github.event.inputs.path }} -O ${{ matrix.url }}
+  cache:
+    needs: [ download ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache files
+        uses: actions/checkout@v3
