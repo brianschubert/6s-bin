@@ -6,6 +6,16 @@ on:
       - feat/release-github-action
 
 jobs:
+  download_archives:
+    uses: ./.github/workflows/web_artifact.yaml
+    with:
+      name: 6s-archives
+      urls: |
+        [
+          "https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar", 
+          "https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar"
+        ]
+      retention-days: 1
   build:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -34,6 +44,8 @@ jobs:
 
       - name: Build wheel
         run: python -I -m build --wheel
+        env:
+          SIXS_ARCHIVE_DIR: 6s-archives
 
       - name: Build sdist
         if: ${{ matrix.sdist }}
