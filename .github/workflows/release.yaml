@@ -17,6 +17,7 @@ jobs:
         ]
       retention-days: 1
   build:
+    needs: download_archives
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     strategy:
