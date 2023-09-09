@@ -5,6 +5,7 @@ description = "Convenience distribution for building and installing local 6S exe
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
 readme = "README.md"
+repository = "https://github.com/brianschubert/6s-bin"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
