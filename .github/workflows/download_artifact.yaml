@@ -6,13 +6,10 @@ on:
       urls:
         required: true
         type: string
-      name:
+      artifact-path:
         required: true
         type: string
-      path:
-        required: true
-        type: string
-      artifact:
+      artifact-name:
         required: true
         type: string
 
@@ -26,9 +23,9 @@ jobs:
     steps:
       - name: Download file
         run:
-          curl --create-dirs --output-dir ${{ github.event.inputs.path }}s -O ${{ matrix.url }}
+          curl --create-dirs --output-dir ${{ github.event.inputs.artifact-path }}s -O ${{ matrix.url }}
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.inputs.name }}
-          path: ${{ github.event.inputs.path }}
+          name: ${{ github.event.inputs.artifact-name }}
+          path: ${{ github.event.inputs.artifact-path }}
           retention-days: 1
