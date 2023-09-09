@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Download file
         run:
-          curl --create-dirs --output-dir ${{ inputs.artifact-path }}s -O ${{ matrix.url }}
+          curl --create-dirs --output-dir ${{ inputs.artifact-path }} -O ${{ matrix.url }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifact-name }}
