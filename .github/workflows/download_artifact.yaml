@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        url: ${{ fromJSON(github.event.inputs.urls) }}
+        url: ${{ fromJSON(inputs.urls) }}
     steps:
       - name: Download file
         run:
-          curl --create-dirs --output-dir ${{ github.event.inputs.artifact-path }}s -O ${{ matrix.url }}
+          curl --create-dirs --output-dir ${{ inputs.artifact-path }}s -O ${{ matrix.url }}
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.inputs.artifact-name }}
-          path: ${{ github.event.inputs.artifact-path }}
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.artifact-path }}
           retention-days: 1
