@@ -1,14 +1,20 @@
-name: Download from web and upload as artifact
+name: Web artifacts
 
 on:
   workflow_call:
     inputs:
+      name:
+        required: true
+        type: string
+        description: Artifact name. See 'actions/upload-artifact'.
       urls:
         required: true
         type: string
-      artifact-name:
-        required: true
-        type: string
+        description: JSON string encoding a list of download URLs.
+      retention-days:
+        type: number
+        default: 0
+        description: Artifact retention. See 'actions/upload-artifact'.
 
 jobs:
   download:
@@ -24,4 +30,4 @@ jobs:
         with:
           name: ${{ inputs.artifact-name }}
           path: artifacts
-          retention-days: 1
+          retention-days: ${{ inputs.artifact-retention-days }}

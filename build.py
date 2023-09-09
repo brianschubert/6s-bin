@@ -130,7 +130,6 @@ def _resolve_source(target: SixSTarget, directory: pathlib.Path):
     else:
         # No cached source - download fresh copy.
         print(f"Downloading 6S archive from '{target.archive_url}'")
-        raise BuildError("reached download")
 
         response: http.client.HTTPResponse = urllib.request.urlopen(target.archive_url)
         if response.status != http.HTTPStatus.OK.value:
