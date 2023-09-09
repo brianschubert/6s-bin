@@ -1,0 +1,33 @@
+name: Web artifacts
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+        description: Artifact name. See 'actions/upload-artifact'.
+      urls:
+        required: true
+        type: string
+        description: JSON string encoding a list of download URLs.
+      retention-days:
+        type: number
+        default: 0
+        description: Artifact retention. See 'actions/upload-artifact'.
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        url: ${{ fromJSON(inputs.urls) }}
+    steps:
+      - name: Download file
+        run:
+          curl --create-dirs --output-dir artifacts -O ${{ matrix.url }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.name }}
+          path: artifacts
+          retention-days: ${{ inputs.retention-days }}
