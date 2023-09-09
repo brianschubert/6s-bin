@@ -4,21 +4,15 @@ on: [ push ]
 
 jobs:
   download_archives:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        archive_url:
-          - 'https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar'
-          - 'https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar'
-    steps:
-      - name: Download file
-        run:
-          curl --create-dirs --output-dir 6s-archives -O ${{ matrix.archive_url }}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: 6s-archives
-          path: 6s-archives
-          retention-days: 1
+    uses: ./.github/workflows/download_artifact.yaml
+    with:
+      urls: |
+          [
+            "https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar",
+            "https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar"
+          ]
+      name: 6s-archives
+      path: 6s-archives
   test:
     needs: download_archives
     runs-on: ${{ matrix.os }}
