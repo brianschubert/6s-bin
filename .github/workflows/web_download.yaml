@@ -1,4 +1,4 @@
-name: Download and cache
+name: Download from web and upload as artifact
 
 on:
   workflow_call:
@@ -6,13 +6,9 @@ on:
       urls:
         required: true
         type: string
-      artifact-path:
-        required: true
-        type: string
       artifact-name:
         required: true
         type: string
-
 
 jobs:
   download:
@@ -23,9 +19,9 @@ jobs:
     steps:
       - name: Download file
         run:
-          curl --create-dirs --output-dir ${{ inputs.artifact-path }} -O ${{ matrix.url }}
+          curl --create-dirs --output-dir artifacts -O ${{ matrix.url }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifact-name }}
-          path: ${{ inputs.artifact-path }}
+          path: artifacts
           retention-days: 1

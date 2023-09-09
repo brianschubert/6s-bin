@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   download_archives:
-    uses: ./.github/workflows/download_artifact.yaml
+    uses: ./.github/workflows/web_download.yaml
     with:
       urls: |
         [
@@ -12,7 +12,6 @@ jobs:
           "https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar"
         ]
       artifact-name: 6s-archives
-      artifact-path: 6s-archives
   test:
     needs: download_archives
     runs-on: ${{ matrix.os }}
