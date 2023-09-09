@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   download_archives:
-    uses: ./.github/workflows/web_download.yaml
+    uses: ./.github/workflows/web_artifact.yaml
     with:
       name: 6s-archives
       urls: |
