@@ -9,21 +9,23 @@ on:
       path:
         required: true
         type: string
+      artifact:
+        required: true
+        type: string
 
 
 jobs:
   download:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         url: ${{ fromJSON(github.event.inputs.urls) }}
     steps:
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.event.inputs.path }}
+          key: url_files
       - name: Download file
         run:
           curl --create-dirs --output-dir ${{ github.event.inputs.path }} -O ${{ matrix.url }}
-  cache:
-    needs: [ download ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache files
-        uses: actions/checkout@v3
