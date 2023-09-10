@@ -1,9 +1,6 @@
 name: Tests
 
-on:
-  push:
-    branches:
-      - '!feat/release-github-action'
+on: [ push ]
 
 jobs:
   download_archives:
