@@ -46,6 +46,16 @@ py6s = "^1.9.2"
 [tool.poetry.extras]
 wrapper = ["py6s", "python-dateutil"]
 
+[tool.poetry.scripts]
+# Expose console scripts that launch 6S in a subprocess.
+# These scripts have overhead compared to running 6S directly, but allow 6S to be usuable from PATH without any
+# additional steps after installation.
+# Alterively, we could expose 6S binaries directly using something like
+#      "sixsV1.1" = { reference =  "src/sixs_bin/sixsV1.1", type = "file }
+# but this results in the binary being duplicated in the wheel, which doubles their size.
+"sixsV1.1" = "sixs_bin._cli:_exec_11"
+"sixsV2.1" = "sixs_bin._cli:_exec_21"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

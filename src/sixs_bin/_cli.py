@@ -67,6 +67,24 @@ def _make_version() -> str:
     return f"{sixs_bin.DISTRIBUTION_NAME} {sixs_bin.__version__} (6S {', '.join(sixs_bin._SIXS_BINARIES.keys())})"
 
 
+def _exec_subprocess(sixs_path: pathlib.Path) -> None:
+    """Execute the given 6S executable in a subprocess."""
+    proc_args = (sixs_path,)
+    ret_code = subprocess.Popen(proc_args).wait()
+    if ret_code:
+        raise subprocess.CalledProcessError(ret_code, proc_args)
+
+
+def _exec_11() -> None:
+    """Launch 6SV1.1 subprocess, bypassing main CLI entrypoint."""
+    _exec_subprocess(sixs_bin.get_path("1.1"))
+
+
+def _exec_21() -> None:
+    """Launch 6SV2.1 subprocess, bypassing main CLI entrypoint."""
+    _exec_subprocess(sixs_bin.get_path("2.1"))
+
+
 def main(cli_args: list[str]) -> None:
     """CLI entrypoint."""
     parser = _make_parser()
@@ -77,10 +95,7 @@ def main(cli_args: list[str]) -> None:
         return
 
     if args.exec is not None:
-        proc_args = (sixs_bin.get_path(args.exec),)
-        ret_code = subprocess.Popen(proc_args).wait()
-        if ret_code:
-            raise subprocess.CalledProcessError(ret_code, proc_args)
+        _exec_subprocess(sixs_bin.get_path(args.exec))
         return
 
     if args.path is not None:
