@@ -27,3 +27,7 @@ def test_bad_path() -> None:
 
     with pytest.raises(SystemExit):
         sixs_cli.main(["--path"])
+
+
+def test_test_wrapper() -> None:
+    sixs_cli.main(["--test-wrapper"])
