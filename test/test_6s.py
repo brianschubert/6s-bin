@@ -1,7 +1,7 @@
 import pathlib
 import re
 import subprocess
-from collections.abc import Iterable
+from collections.abc import Iterator
 from typing import Final
 
 import pytest
@@ -32,7 +32,7 @@ INPUT_FILE: Final = """\
 """
 
 
-def sixs_binaries() -> Iterable[pathlib.Path]:
+def sixs_binaries() -> Iterator[pathlib.Path]:
     for version in sixs_bin._SIXS_BINARIES.keys():
         yield sixs_bin.get_path(version)
 
