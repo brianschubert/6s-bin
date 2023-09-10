@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "6s-bin"
-version = "0.6.0"
+version = "0.7.0"
 description = "Convenience distribution for building and installing local 6S executables."
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
 readme = "README.md"
+repository = "https://github.com/brianschubert/6s-bin"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
@@ -16,10 +17,17 @@ packages = [
     { from = "src", include = "sixs_bin" }
 ]
 include = [
-    "src/sixs_bin/sixsV1.1",
-    "src/sixs_bin/sixsV2.1",
+    # Only include compiled 6S binaries in (platform-specific) wheel distributions.
+    # We don't want them in included in source distributions, since those may be used on different platforms.
+    { path = "src/sixs_bin/sixsV1.1", format = "wheel" },
+    { path = "src/sixs_bin/sixsV2.1", format = "wheel" },
 ]
-build = "build.py"
+
+[tool.poetry.build]
+# Note: custom build scripts are currently an undocummented feature of poetry.
+# See https://github.com/python-poetry/poetry/issues/2740.
+script = "build.py"
+generate-setup-file = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
