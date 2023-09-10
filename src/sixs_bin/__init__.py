@@ -1,5 +1,5 @@
 """
-Wrapper for local 6S binaries.
+Compiled binaries for the 6S Radiative Transfer Model exposed as package resources.
 """
 # Copyright (C) 2023 Brian Schubert.
 #
