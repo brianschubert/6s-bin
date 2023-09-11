@@ -49,7 +49,7 @@ def test_bad_path() -> None:
         sixs_cli.main(["--path"])
 
 
-def test_exec_matches(sixs_version, manual_input_file) -> None:
+def test_exec_matches(sixs_version, manual_input_file, helpers) -> None:
     """
     Verify that output when using ``--exec`` exactly matches the output of directly
     calling the binary.
@@ -67,8 +67,18 @@ def test_exec_matches(sixs_version, manual_input_file) -> None:
     cli_result = _run_self_subprocess(["--exec", sixs_version], **proc_args)
 
     assert direct_result.returncode == cli_result.returncode
-    assert direct_result.stdout == cli_result.stdout
     assert direct_result.stderr == cli_result.stderr
+
+    direct_lines = direct_result.stdout.splitlines()
+    cli_lines = cli_result.stdout.splitlines()
+    assert len(direct_lines) == len(cli_lines)
+
+    # Use more generous tolerance on macOS, where rounding differences between
+    # runs have been observed.
+    abs_tol = 1e-4 if sys.platform == "darwin" else 0.0
+
+    for d_line, c_line in zip(direct_lines, cli_lines):
+        helpers.assert_embedded_isclose(d_line, c_line, abs_tol=abs_tol)
 
 
 def test_exec_eof(sixs_version) -> None:
