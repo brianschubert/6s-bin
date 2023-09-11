@@ -17,6 +17,7 @@ Command line interface.
 
 import argparse
 import pathlib
+import subprocess
 import sys
 
 import sixs_bin
@@ -35,10 +36,27 @@ def _make_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print version information and exit.",
     )
-    parser.add_argument(
+
+    command_group = parser.add_argument_group(
+        title="command"
+    ).add_mutually_exclusive_group()
+
+    command_group.add_argument(
         "--path",
         choices=sixs_bin._SIXS_BINARIES.keys(),
         help="Print the path to the specified 6S executable from this package's resources.",
+    )
+    command_group.add_argument(
+        "--exec",
+        choices=sixs_bin._SIXS_BINARIES.keys(),
+        help="Execute specified 6S executable in a subprocess, inheriting stdin and stdout. This option is provided"
+        " as a convenience, but its use is not recommended. Running 6S using this option is about 5%% slower than"
+        " executing the binary directly, due the overhead of starting the Python interpreter and subprocess.",
+    )
+    command_group.add_argument(
+        "--test-wrapper",
+        action="store_true",
+        help="Run Py6S.SixS.test on this package's 6SV1.1 executable.",
     )
 
     return parser
@@ -58,8 +76,20 @@ def main(cli_args: list[str]) -> None:
         print(_make_version())
         return
 
+    if args.exec is not None:
+        proc_args = (sixs_bin.get_path(args.exec),)
+        ret_code = subprocess.Popen(proc_args).wait()
+        if ret_code:
+            raise subprocess.CalledProcessError(ret_code, proc_args)
+        return
+
     if args.path is not None:
         print(sixs_bin.get_path(args.path))
+        return
+
+    if args.test_wrapper:
+        wrapper = sixs_bin.make_wrapper("1.1")
+        wrapper.test(wrapper.sixs_path)
         return
 
     parser.print_help()

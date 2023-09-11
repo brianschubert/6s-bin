@@ -1,14 +1,13 @@
-# 6S Binary Distribution
+# 6S Binaries
 
-[![release workflow](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions)
-[![tests workflow](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions)
+[![release workflow](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml)
+[![tests workflow](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml)
 [![License](https://img.shields.io/github/license/brianschubert/6s-bin)](./LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
 
+This distribution provides access to compiled binaries of the [6S Radiative Transfer Model](https://salsa.umd.edu/6spage.html) as [package resources](https://docs.python.org/3/library/importlib.resources.html#module-importlib.resources).
 
-Convenience distribution for building and installing local [6S](https://salsa.umd.edu/6spage.html) executables.
-
-Provides binaries for 6S v1.1 and 6S v2.1 as package resources.
+Currently, binaries for 6SV1.1 and 6SV2.1 are included.
 
 ## Install
 
@@ -26,7 +25,7 @@ $ pip install .
 
 Call `sixs_bin.get_path(version)` to get the path to an installed 6S binary. The parameter `version` is required, and must be either the string `"1.1"` or `"2.1"`.
 
-If you also have [Py6S][Py6S] installed, you can call `sixs_bin.make_wrapper()` to get a `Py6S.SixS` instance that's configured to use the installed 6S v1.1 binary.
+If you also have [Py6S][Py6S] installed, you can call `sixs_bin.make_wrapper()` to get a `Py6S.SixS` instance that's configured to use the installed 6SV1.1 binary.
 
 ## Command Line Usage
 
