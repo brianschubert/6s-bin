@@ -1,52 +1,21 @@
-import pathlib
 import re
 import subprocess
-from collections.abc import Iterator
-from typing import Final
 
 import pytest
 
 import sixs_bin
 
-# Taken from "6S User Guide Version 3, November 2006, APPENDIX II: EXAMPLES OF INPUTS
-# AND OUTPUTS", available at https://salsa.umd.edu/6spage.html.
-INPUT_FILE: Final = """\
-0                           (User-defined geometric conditions)
-40.0 100.0 45.0 50.0 7 23   (SZA, SAZ, VZA, VAZ, month, day)
-8                           (User-defined molecular atmosphere model)
-3.0 3.5                     (Contents of H2O-vapor (g/cm^2) & 0 3 (cm-atm))
-4                           (Aerosol model)
-0.25 0.25 0.25 0.25         (% of dust-like, water-soluble, oceanic, & soot)
-0                           (Input of aerosol opt. thickness instead of visibility)
-0.5                         (Aerosol optical thickness at 550 nm)
--0.2                        (Target at 0.2 km above the sea level)
--3.3                        (Aircraft at 3.3 km above the ground level)
--1.5 -3.5                   (H2O-vapor & O3 under the aircraft are not available)
-0.25                        (Aerosol opt. thickness under the aircraft at 550 nm)
-11                          (AVHRR 1 (NOAA 9) Band)
-1                           (Non-uniform ground surface)
-2 1 0.5                     (Target reflect., environ. reflect., target radius (km))
-1                           (Request for atmospheric correction)
--0.1                        (Parameter of the atmospheric correction)
-4                           (Ground surface is not polarized)
-"""
+
+def test_get_path(sixs_binary) -> None:
+    """Verify that 6S binary file exists."""
+    assert sixs_binary.is_file()
 
 
-def sixs_binaries() -> Iterator[pathlib.Path]:
-    for version in sixs_bin._SIXS_BINARIES.keys():
-        yield sixs_bin.get_path(version)
-
-
-@pytest.mark.parametrize("binary", sixs_binaries(), ids=lambda p: p.name)
-def test_get_path(binary) -> None:
-    assert binary.is_file()
-
-
-@pytest.mark.parametrize("binary", sixs_binaries(), ids=lambda p: p.name)
-def test_basic_run(binary) -> None:
+def test_basic_run(sixs_binary, manual_input_file) -> None:
+    """Perform a basic 6S simulation and check that the output format looks correct."""
     result = subprocess.run(
-        [binary],
-        input=INPUT_FILE,
+        [sixs_binary],
+        input=manual_input_file,
         capture_output=True,
         check=True,
         text=True,
@@ -63,7 +32,7 @@ def test_basic_run(binary) -> None:
             f"6S malformed output - could not find version in first"
             f" non-whitespace output line: '{output_lines[0]}'"
         )
-    assert version_match.group(1) == binary.name[5:]
+    assert version_match.group(1) == sixs_binary.name[5:]
 
     # Check a single line in the output.
 
@@ -94,7 +63,8 @@ def test_basic_run(binary) -> None:
 
 
 def test_wrapper() -> None:
+    """Verify that ``Py6S.SixS.test`` run successfully if ``Py6S`` is available."""
     Py6S = pytest.importorskip("Py6S")
 
     wrapper = sixs_bin.make_wrapper()
-    Py6S.SixS.test(wrapper.sixs_path)
+    assert Py6S.SixS.test(wrapper.sixs_path) == 0

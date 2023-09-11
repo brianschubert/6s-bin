@@ -10,7 +10,7 @@ import sixs_bin._cli as sixs_cli
 
 def _run_self_subprocess(
     cli_args: list[str], **kwargs: Any
-) -> subprocess.CompletedProcess:
+) -> subprocess.CompletedProcess[Any]:
     """
     Run the command line interface in a subprocess.
 
@@ -23,6 +23,7 @@ def _run_self_subprocess(
 
 
 def test_version(capsys) -> None:
+    """Verify that ``--version`` flag prints version information and exits."""
     sixs_cli.main(["--version"])
 
     captured = capsys.readouterr()
@@ -30,16 +31,17 @@ def test_version(capsys) -> None:
     assert captured.err == ""
 
 
-@pytest.mark.parametrize("version", sixs_bin._SIXS_BINARIES.keys())
-def test_good_path(version, capsys) -> None:
-    sixs_cli.main(["--path", version])
+def test_good_path(sixs_version, capsys) -> None:
+    """Verify that ``--path`` output matches the request binaries path."""
+    sixs_cli.main(["--path", sixs_version])
 
     captured = capsys.readouterr()
-    assert captured.out.strip() == str(sixs_bin.get_path(version))
+    assert captured.out == f"{sixs_bin.get_path(sixs_version)}\n"
     assert captured.err == ""
 
 
 def test_bad_path() -> None:
+    """Verify that the CLI exits with error on bad ``--path`` arguments."""
     with pytest.raises(SystemExit):
         sixs_cli.main(["--path", "does-not-exist"])
 
@@ -49,10 +51,12 @@ def test_bad_path() -> None:
 
 @pytest.mark.parametrize("version", sixs_bin._SIXS_BINARIES.keys())
 def test_exec_eof(version) -> None:
+def test_exec_eof(sixs_version) -> None:
+    """Check error message on empty input file."""
     with pytest.raises(subprocess.CalledProcessError) as exec_info:
         # Run in subprocess to reliably control stdin.
         _run_self_subprocess(
-            ["--exec", version],
+            ["--exec", sixs_version],
             check=True,
             capture_output=True,
             text=True,
@@ -66,6 +70,7 @@ def test_exec_eof(version) -> None:
 
 
 def test_exec_bad() -> None:
+    """Verify that the CLI exits with error on bad ``--exec`` arguments."""
     with pytest.raises(SystemExit):
         sixs_cli.main(["--exec", "does-not-exist"])
 
@@ -74,4 +79,7 @@ def test_exec_bad() -> None:
 
 
 def test_test_wrapper() -> None:
+    """Verify that ``--test-wrapper`` runs without error when Py6S is installed."""
+    # TODO: expand tests for when wrapper dependency is and is not available.
+    pytest.importorskip("Py6S")
     sixs_cli.main(["--test-wrapper"])
