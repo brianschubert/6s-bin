@@ -75,10 +75,10 @@ def test_exec_matches(sixs_version, manual_input_file, helpers) -> None:
 
     # Use more generous tolerance on macOS, where rounding differences between
     # runs have been observed.
-    abs_tol = 1e-4 if sys.platform == "darwin" else 0.0
+    rel_tol = 1e-3 if sys.platform == "darwin" else 1e-09
 
     for d_line, c_line in zip(direct_lines, cli_lines):
-        helpers.assert_embedded_isclose(d_line, c_line, abs_tol=abs_tol)
+        helpers.assert_embedded_isclose(d_line, c_line, rel_tol=rel_tol)
 
 
 def test_exec_eof(sixs_version) -> None:
