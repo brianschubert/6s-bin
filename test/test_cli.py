@@ -49,8 +49,28 @@ def test_bad_path() -> None:
         sixs_cli.main(["--path"])
 
 
-@pytest.mark.parametrize("version", sixs_bin._SIXS_BINARIES.keys())
-def test_exec_eof(version) -> None:
+def test_exec_matches(sixs_version, manual_input_file) -> None:
+    """
+    Verify that output when using ``--exec`` exactly matches the output of directly
+    calling the binary.
+    """
+    proc_args = {
+        "input": manual_input_file,
+        "capture_output": True,
+        "check": True,
+        "text": True,
+        "encoding": "ascii",
+    }
+
+    direct_result = subprocess.run([sixs_bin.get_path(sixs_version)], **proc_args)
+
+    cli_result = _run_self_subprocess(["--exec", sixs_version], **proc_args)
+
+    assert direct_result.returncode == cli_result.returncode
+    assert direct_result.stdout == cli_result.stdout
+    assert direct_result.stderr == cli_result.stderr
+
+
 def test_exec_eof(sixs_version) -> None:
     """Check error message on empty input file."""
     with pytest.raises(subprocess.CalledProcessError) as exec_info:
