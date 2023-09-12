@@ -24,7 +24,10 @@ def _run_self_subprocess(
 
 def test_version(capsys) -> None:
     """Verify that ``--version`` flag prints version information and exits."""
-    sixs_cli.main(["--version"])
+    with pytest.raises(SystemExit) as exec_info:
+        sixs_cli.main(["--version"])
+
+    assert exec_info.value.code == 0
 
     captured = capsys.readouterr()
     assert captured.out.strip() == sixs_cli._make_version()
