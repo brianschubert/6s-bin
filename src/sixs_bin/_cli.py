@@ -81,8 +81,7 @@ def main(cli_args: list[str]) -> None:
 
     if args.test_wrapper:
         wrapper = sixs_bin.make_wrapper("1.1")
-        wrapper.test(wrapper.sixs_path)
-        return
+        sys.exit(wrapper.test(wrapper.sixs_path))
 
     parser.print_help()
 

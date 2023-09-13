@@ -115,4 +115,7 @@ def test_test_wrapper() -> None:
     """Verify that ``--test-wrapper`` runs without error when Py6S is installed."""
     # TODO: expand tests for when wrapper dependency is and is not available.
     pytest.importorskip("Py6S")
-    sixs_cli.main(["--test-wrapper"])
+    with pytest.raises(SystemExit) as exec_info:
+        sixs_cli.main(["--test-wrapper"])
+
+    assert exec_info.value.code == 0
