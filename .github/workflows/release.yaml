@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
@@ -76,8 +76,15 @@ jobs:
           name: dist-build
           path: dist
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
       - name: Configure wheel platform compatibility tags
-        run: python3 -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
+        run: |
+          python -m pip install --upgrade wheel
+          python -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
 
       - uses: actions/upload-artifact@v3
         with:
