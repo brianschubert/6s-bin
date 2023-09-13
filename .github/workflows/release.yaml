@@ -2,8 +2,6 @@ name: Release
 
 on:
   push:
-    branches:
-      - 'feat/generalize-wheel-compatibility-tags'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'  # Only run for full release tags
 
