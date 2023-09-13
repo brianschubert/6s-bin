@@ -26,24 +26,22 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
-        python-version: [ "3.9", "3.10", "3.11" ]
         include:
           - os: ubuntu-latest
-            python-version: '3.11'
             sdist: true
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Set up Fortran
         uses: awvwgk/setup-fortran@v1
 
       - name: Install build frontend
-        run: python -m pip install --upgrade pip build
+        run: python -m pip install --upgrade pip build wheel
 
       - name: Retrieve 6S source archives
         uses: actions/download-artifact@v3
@@ -62,13 +60,39 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: dist
+          name: dist-build
+          path: dist
+          retention-days: 5
+          if-no-files-found: error
+
+  tag_wheels:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-build
+          path: dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Configure wheel platform compatibility tags
+        run: |
+          python -m pip install --upgrade wheel
+          python -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist-release
           path: dist
           retention-days: 5
           if-no-files-found: error
 
   publish:
-    needs: build
+    needs: tag_wheels
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     permissions:
@@ -77,7 +101,7 @@ jobs:
       - name: Retrieve distributions
         uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: dist-release
           path: dist
 
       - name: Publish distributions to TestPyPI
