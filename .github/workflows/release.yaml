@@ -56,22 +56,38 @@ jobs:
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
 
-      - name: Configure wheel platform compatibility tags
-        run: python3 -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
-
       - name: Build sdist
         if: ${{ matrix.sdist }}
         run: python -I -m build --sdist
 
       - uses: actions/upload-artifact@v3
         with:
-          name: dist
+          name: dist-build
+          path: dist
+          retention-days: 5
+          if-no-files-found: error
+
+  tag_wheels:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-build
+          path: dist
+
+      - name: Configure wheel platform compatibility tags
+        run: python3 -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist-release
           path: dist
           retention-days: 5
           if-no-files-found: error
 
   publish:
-    needs: build
+    needs: tag_wheels
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     permissions:
@@ -80,7 +96,7 @@ jobs:
       - name: Retrieve distributions
         uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: dist-release
           path: dist
 
       - name: Publish distributions to TestPyPI
