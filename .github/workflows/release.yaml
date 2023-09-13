@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+      - 'feat/release-self-check'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'  # Only run for full release tags
 
@@ -91,8 +93,43 @@ jobs:
           retention-days: 5
           if-no-files-found: error
 
-  publish:
+  check:
     needs: tag_wheels
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
+        python-version: [ "3.9", "3.10", "3.11" ]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-release
+          path: dist
+
+      # Makes sure that the installed distribution is from the wheels that were just built and not downloaded from PyPI.
+      #   --no-index    - only search './dist' (not PyPI)
+      #   --only-binary - use a wheel (not sdist)
+      #   --no-deps     - only install named distribution (do not try to find other dependencies)
+      - name: Install candidate wheel without dependencies
+        run: python -m pip install --no-index --only-binary ':all:' --no-deps --find-links=dist 6s-bin
+
+      # Install remaining dependency from PyPI, including those for the 'wrapper' extra.
+      - name: Install candidate wheel's dependencies from PyPI
+        run: |
+          python -m pip install --find-links=dist '6s-bin[wrapper]' | grep 'Requirement already satisfied: 6s-bin'
+
+      - name: Self check installed wheel
+        run: python -m sixs_bin --test-wrapper
+
+  publish:
+    needs: check
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     permissions:
