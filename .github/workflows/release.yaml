@@ -57,8 +57,8 @@ jobs:
       # In the job that builds the source distribution, call 'build' with no arguments so that it builds the wheel
       # from the sdist. In all other jobs, the wheel is built directly from the source directory.
       # This way, we confirm that wheels can be successfully built from the sdist.
-      - name: Build wheel ${{ matrix.sdist && "and sdist" }}
-        run: python -I -m build ${{ !matrix.sdist && "--wheel" }}
+      - name: Build wheel${{ matrix.sdist && ' and sdist' || '' }}
+        run: python -I -m build ${{ !matrix.sdist && '--wheel' || '' }}
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
 
