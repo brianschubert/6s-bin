@@ -16,6 +16,7 @@ Command line interface.
 # limitations under the License.
 
 import argparse
+import os
 import pathlib
 import subprocess
 import sys
@@ -54,6 +55,11 @@ def _make_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run Py6S.SixS.test on this package's 6SV1.1 executable.",
     )
+    command_group.add_argument(
+        "--check-integrity",
+        action="store_true",
+        help="Run a self-check on the integrity the package resources.",
+    )
 
     return parser
 
@@ -82,6 +88,18 @@ def main(cli_args: list[str]) -> None:
     if args.test_wrapper:
         wrapper = sixs_bin.make_wrapper("1.1")
         sys.exit(wrapper.test(wrapper.sixs_path))
+
+    if args.check_integrity:
+        any_error = False
+        for version in sixs_bin._SIXS_BINARIES.keys():
+            path = sixs_bin.get_path(version)
+            exists = path.exists()
+            executable = os.access(path, os.X_OK)
+            print(f"{path}: {exists=} {executable=}")
+
+            any_error |= not (exists and executable)
+
+        sys.exit(any_error)
 
     parser.print_help()
 

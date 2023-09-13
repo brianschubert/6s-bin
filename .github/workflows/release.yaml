@@ -134,6 +134,10 @@ jobs:
           python -m pip install --find-links=dist '6s-bin[wrapper]'
         if: ${{ contains(matrix.os, 'windows') }}
 
+      - name: Check package resource integrity
+        run: |
+          python -m sixs_bin --check-integrity
+
       - name: Self check installed wheel
         run: python -m sixs_bin --test-wrapper
 
