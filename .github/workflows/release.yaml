@@ -57,7 +57,7 @@ jobs:
           SIXS_ARCHIVE_DIR: 6s-archives
 
       - name: Configure wheel platform compatibility tags
-        run: python3 -m wheel --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
+        run: python3 -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
 
       - name: Build sdist
         if: ${{ matrix.sdist }}
