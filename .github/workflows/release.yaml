@@ -134,24 +134,18 @@ jobs:
           python -m pip install --find-links=dist '6s-bin[wrapper]'
         if: ${{ contains(matrix.os, 'windows') }}
 
-      - name: Check package resource integrity
-        run: |
-          python -m sixs_bin --check-integrity
-
       - uses: actions/checkout@v3
+        with:
+          sparse-checkout: |
+            pyproject.toml
+            test
+            sparse-checkout-cone-mode: false
 
-#      - name: Set up Fortran
-#        uses: awvwgk/setup-fortran@v1
-
-      - name: Temporary test 6S run
+      - name: Run pytest
         if: ${{ contains(matrix.os, 'windows') }}
         run: |
           python -m pip install pytest
-          $sixs_exec = python -m sixs_bin --path 1.1
-          Write-Output $foo
-          $sixs_dir = (Get-Item $sixs_exec).Directory.FullName
-          Write-Output $sixs_dir
-          dir $sixs_dir
+          dir
           pytest
 
       - name: Self check installed wheel
