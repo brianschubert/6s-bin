@@ -236,7 +236,7 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
                 "make",
                 "-j",
                 "sixs",
-                "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none -static $(FFLAGS)",
+                "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none -static-libgfortran $(FFLAGS)",
             ],
             cwd=src_dir,
             capture_output=True,
