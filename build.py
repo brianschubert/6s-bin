@@ -32,6 +32,7 @@ import pathlib
 import shutil
 import stat
 import subprocess
+import sys
 import tarfile
 import tempfile
 import textwrap
@@ -89,6 +90,11 @@ TARGETS: Final = [
         archive_sha256="42422db29c095a49eaa98556b416405eb818be1ee30139d2a1913dbf3b0c7de1",
     ),
 ]
+
+
+def _is_windows() -> bool:
+    """Return True if the current platform is Windows."""
+    return sys.platform == "win32"
 
 
 def _assert_detect_command(cmd: list[str]) -> None:
@@ -230,13 +236,17 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
     if not src_dir.joinpath("Makefile").exists():
         raise BuildError(f"could not find Makefile in source directory '{src_dir}'")
 
+    fc_override = (
+        f"FC=gfortran -std=legacy -ffixed-line-length-none"
+        f" -ffpe-summary=none {'-static-libgfortran' if _is_windows() else ''} $(FFLAGS)"
+    )
     try:
         subprocess.run(
             [
                 "make",
                 "-j",
                 "sixs",
-                "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)",
+                fc_override,
             ],
             cwd=src_dir,
             capture_output=True,
