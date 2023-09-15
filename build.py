@@ -38,6 +38,7 @@ import tempfile
 import textwrap
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from typing import Final, NamedTuple
 
 # Build script is always invoked from the base directory of the current distribution.
@@ -70,6 +71,25 @@ class SixSTarget(NamedTuple):
     @property
     def archive_name(self) -> str:
         return pathlib.PurePath(urllib.parse.urlparse(self.archive_url).path).name
+
+
+@dataclass
+class BuildConfig:
+    archive_dir: pathlib.Path | None = None
+    static_libgfortran: bool = False
+
+    @classmethod
+    def from_env(cls) -> BuildConfig:
+        archive_dir = os.environ.get("SIXS_ARCHIVE_DIR")
+        if archive_dir is not None:
+            archive_dir = pathlib.Path(archive_dir)
+
+        static_libgfortran = os.environ.get("SIXS_STATIC_LIBGFORTRAN") == "1"
+
+        return cls(
+            archive_dir=archive_dir,
+            static_libgfortran=static_libgfortran,
+        )
 
 
 TARGETS: Final = [
@@ -111,15 +131,15 @@ def _assert_detect_command(cmd: list[str]) -> None:
     print(f"detected {prog}:\n{textwrap.indent(result.stdout, '.. ')}", end="")
 
 
-def _resolve_source(target: SixSTarget, directory: pathlib.Path):
+def _resolve_source(
+    target: SixSTarget, directory: pathlib.Path, archive_directory: pathlib.Path | None
+):
     """
     Locate or download the given 6S target's source archive, validate it, and extract it
     to the specified directory.
 
     Raises ``BuildError`` on download or validation failure.
     """
-
-    archive_directory = os.environ.get(ARCHIVE_CACHE_ENV)
 
     if (
         archive_directory is not None
@@ -209,7 +229,7 @@ def _install(binary: pathlib.Path, target: pathlib.Path) -> None:
     os.chmod(target, target.stat().st_mode | stat.S_IXUSR)
 
 
-def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
+def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> None:
     """Run build in the given directory."""
     binary_dest = PACKAGE_ROOT.joinpath(target.target_name)
 
@@ -219,7 +239,7 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
         return
 
     print(f"Resolving 6S source...")
-    _resolve_source(target, build_dir)
+    _resolve_source(target, build_dir, config.archive_dir)
     # Print extracted files for debugging.
     # for p in sorted(build_dir.glob("**/*")):
     #     print(f"file: {p}")
@@ -238,7 +258,7 @@ def build(target: SixSTarget, build_dir: pathlib.Path) -> None:
 
     fc_override = (
         f"FC=gfortran -std=legacy -ffixed-line-length-none"
-        f" -ffpe-summary=none {'-static-libgfortran' if _is_windows() else ''} $(FFLAGS)"
+        f" -ffpe-summary=none {'-static-libgfortran' if config.static_libgfortran else ''} $(FFLAGS)"
     )
     try:
         subprocess.run(
@@ -284,11 +304,14 @@ def main() -> None:
     _assert_detect_command(["make", "--version"])
     _assert_detect_command(["gfortran", "--version"])
 
+    config = BuildConfig.from_env()
+    print(f"Using {config}")
+
     # Build each 6S target.
     for target in TARGETS:
         print(f"target: {target.target_name}")
         with tempfile.TemporaryDirectory() as build_dir:
-            build(target, pathlib.Path(build_dir))
+            build(target, pathlib.Path(build_dir), config)
 
 
 if __name__ == "__main__":
