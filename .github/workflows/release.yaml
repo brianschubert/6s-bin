@@ -57,6 +57,7 @@ jobs:
         run: python -I -m build ${{ !matrix.sdist && '--wheel' || '' }}
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
+          SIXS_STATIC_LIBGFORTRAN: ${{ contains(matrix.os, 'windows') && '1' || '0' }}
 
       - uses: actions/upload-artifact@v3
         with:

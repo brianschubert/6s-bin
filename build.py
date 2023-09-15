@@ -44,9 +44,6 @@ from typing import Final, NamedTuple
 DISTRIBUTION_ROOT: Final = pathlib.Path.cwd()
 PACKAGE_ROOT: Final = DISTRIBUTION_ROOT / "src" / "sixs_bin"
 
-# Environment variable for specifying a cache directory of 6S source archives.
-ARCHIVE_CACHE_ENV: Final = "SIXS_ARCHIVE_DIR"
-
 
 class BuildError(RuntimeError):
     """Raised on build failure."""
@@ -127,7 +124,7 @@ def _assert_detect_command(cmd: list[str]) -> None:
 
 def _resolve_source(
     target: SixSTarget, directory: pathlib.Path, archive_directory: pathlib.Path | None
-):
+) -> None:
     """
     Locate or download the given 6S target's source archive, validate it, and extract it
     to the specified directory.
