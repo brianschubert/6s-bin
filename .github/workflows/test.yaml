@@ -1,10 +1,6 @@
 name: Tests
 
-#on: [ push ]
-on:
-  push:
-    branches:
-      - '!feat/release-self-check'
+on: [ push ]
 
 jobs:
   download_archives:
