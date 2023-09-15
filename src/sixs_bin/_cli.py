@@ -16,6 +16,7 @@ Command line interface.
 # limitations under the License.
 
 import argparse
+import os
 import pathlib
 import subprocess
 import sys
@@ -31,11 +32,7 @@ def _make_parser() -> argparse.ArgumentParser:
         description="6S v1.1 and 6S v2.1 binaries provided as package resources.",
     )
 
-    parser.add_argument(
-        "--version",
-        action="store_true",
-        help="Print version information and exit.",
-    )
+    parser.add_argument("--version", action="version", version=_make_version())
 
     command_group = parser.add_argument_group(
         title="command"
@@ -72,10 +69,6 @@ def main(cli_args: list[str]) -> None:
     parser = _make_parser()
     args = parser.parse_args(cli_args)
 
-    if args.version:
-        print(_make_version())
-        return
-
     if args.exec is not None:
         proc_args = (sixs_bin.get_path(args.exec),)
         ret_code = subprocess.Popen(proc_args).wait()
@@ -89,8 +82,7 @@ def main(cli_args: list[str]) -> None:
 
     if args.test_wrapper:
         wrapper = sixs_bin.make_wrapper("1.1")
-        wrapper.test(wrapper.sixs_path)
-        return
+        sys.exit(wrapper.test(wrapper.sixs_path))
 
     parser.print_help()
 

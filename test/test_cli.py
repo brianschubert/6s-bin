@@ -24,7 +24,10 @@ def _run_self_subprocess(
 
 def test_version(capsys) -> None:
     """Verify that ``--version`` flag prints version information and exits."""
-    sixs_cli.main(["--version"])
+    with pytest.raises(SystemExit) as exec_info:
+        sixs_cli.main(["--version"])
+
+    assert exec_info.value.code == 0
 
     captured = capsys.readouterr()
     assert captured.out.strip() == sixs_cli._make_version()
@@ -112,4 +115,7 @@ def test_test_wrapper() -> None:
     """Verify that ``--test-wrapper`` runs without error when Py6S is installed."""
     # TODO: expand tests for when wrapper dependency is and is not available.
     pytest.importorskip("Py6S")
-    sixs_cli.main(["--test-wrapper"])
+    with pytest.raises(SystemExit) as exec_info:
+        sixs_cli.main(["--test-wrapper"])
+
+    assert exec_info.value.code == 0
