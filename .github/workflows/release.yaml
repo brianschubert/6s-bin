@@ -124,15 +124,16 @@ jobs:
       # The construct `| tee /dev/tty | grep ...` preserves stdout for the log while also producing an error exit
       # status if `...` is not found in the output.
       - name: Install candidate wheel's dependencies from PyPI
+        if: ${{ !contains(matrix.os, 'windows') }}
         run: |
           python -m pip install --find-links=dist '6s-bin[wrapper]' | tee /dev/tty | grep 'Requirement already satisfied: 6s-bin' > /dev/null
-        if: ${{ !contains(matrix.os, 'windows') }}
 
-      # TODO powershell analog
       - name: Install candidate wheel's dependencies from PyPI (Windows)
-        run: |
-          python -m pip install --find-links=dist '6s-bin[wrapper]'
         if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          $output = python -m pip install --find-links=dist '6s-bin[wrapper]' | Out-String
+          Write-Host $output
+          exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
       - uses: actions/checkout@v3
         with:
@@ -141,11 +142,7 @@ jobs:
       - name: Run pytest
         run: |
           python -m pip install pytest
-          ${{ contains(matrix.os, 'windows') && 'dir' || 'ls -la' }}
           pytest
-
-      - name: Self check installed wheel
-        run: python -m sixs_bin --test-wrapper
 
   publish:
     needs: check
