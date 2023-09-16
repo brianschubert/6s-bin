@@ -1,0 +1,147 @@
+name: Build
+
+on: [ workflow_call, workflow_dispatch ]
+
+jobs:
+
+  download_archives:
+    uses: ./.github/workflows/web_artifact.yaml
+    with:
+      name: 6s-archives
+      urls: |
+        [
+          "https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar", 
+          "https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar"
+        ]
+      retention-days: 1
+
+  build:
+    needs: download_archives
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
+        include:
+          - os: ubuntu-latest
+            sdist: true
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Set up Fortran
+        uses: awvwgk/setup-fortran@v1
+
+      - name: Install build frontend
+        run: python -m pip install --upgrade pip build
+
+      - name: Retrieve 6S source archives
+        uses: actions/download-artifact@v3
+        with:
+          name: 6s-archives
+          path: 6s-archives
+
+      # Only build source distribution in a single job.
+      # In the job that builds the source distribution, call 'build' with no arguments so that it builds the wheel
+      # from the sdist. In all other jobs, the wheel is built directly from the source directory.
+      # This way, we confirm that wheels can be successfully built from the sdist.
+      - name: Build wheel${{ matrix.sdist && ' and sdist' || '' }}
+        run: python -I -m build ${{ !matrix.sdist && '--wheel' || '' }}
+        env:
+          SIXS_ARCHIVE_DIR: 6s-archives
+          SIXS_STATIC_LIBGFORTRAN: ${{ contains(matrix.os, 'windows') && '1' || '0' }}
+          SIXS_BUILD_LOG: ${{ matrix.os }}-buildpy.log
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist-build
+          path: dist
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: buildpy-logs
+          path: ${{ matrix.os }}-buildpy.log
+          if-no-files-found: error
+
+  tag_wheels:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-build
+          path: dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Configure wheel platform compatibility tags
+        run: |
+          python -m pip install --upgrade wheel
+          python -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist-release
+          path: dist
+          if-no-files-found: error
+
+  check:
+    needs: tag_wheels
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
+        python-version: [ "3.9", "3.10", "3.11" ]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-release
+          path: dist
+
+      # Makes sure that the installed distribution is from the wheels that were just built and not downloaded from PyPI.
+      #   --no-index    - only search './dist' (not PyPI)
+      #   --only-binary - use a wheel (not sdist)
+      #   --no-deps     - only install named distribution (do not try to find other dependencies)
+      - name: Install candidate wheel without dependencies
+        run: python -m pip install --no-index --only-binary ':all:' --no-deps --find-links=dist 6s-bin
+
+      # Install remaining dependency from PyPI, including those for the 'wrapper' extra.
+      # The construct `| tee /dev/tty | grep ...` preserves stdout for the log while also producing an error exit
+      # status if `...` is not found in the output.
+      - name: Install candidate wheel's dependencies from PyPI
+        if: ${{ !contains(matrix.os, 'windows') }}
+        run: |
+          python -m pip install --find-links=dist '6s-bin[wrapper]' | tee /dev/tty | grep 'Requirement already satisfied: 6s-bin' > /dev/null
+
+      - name: Install candidate wheel's dependencies from PyPI (Windows)
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          $output = python -m pip install --find-links=dist '6s-bin[wrapper]' | Out-String
+          Write-Host $output
+          exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
+
+      - uses: actions/checkout@v3
+        with:
+          sparse-checkout: test
+
+      - name: Run pytest
+        run: |
+          python -m pip install pytest
+          pytest
+
