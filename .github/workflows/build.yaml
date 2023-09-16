@@ -55,7 +55,7 @@ jobs:
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
           SIXS_STATIC_LIBGFORTRAN: ${{ contains(matrix.os, 'windows') && '1' || '0' }}
-          SIXS_BUILD_LOG: ${{ matrix.os }}-buildpy.log
+          SIXS_BUILD_LOG: ${{ github.workspace }}/${{ matrix.os }}-buildpy.log
 
       - uses: actions/upload-artifact@v3
         with:
