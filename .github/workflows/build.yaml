@@ -54,7 +54,7 @@ jobs:
         run: python -I -m build ${{ !matrix.sdist && '--wheel' || '' }}
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
-          SIXS_STATIC_LIBGFORTRAN: ${{ contains(matrix.os, 'windows') && '1' || '0' }}
+          SIXS_FC_APPEND: ${{ contains(matrix.os, 'windows') && '-static-libgfortran' || null }}
           SIXS_BUILD_LOG: ${{ github.workspace }}/${{ matrix.os }}-buildpy.log
 
       - uses: actions/upload-artifact@v3

@@ -66,7 +66,8 @@ class SixSTarget(NamedTuple):
 @dataclass
 class BuildConfig:
     archive_dir: pathlib.Path | None = None
-    static_libgfortran: bool = False
+    fc_override: str | None = None
+    fc_append: str | None = None
     log_file: pathlib.Path | None = None
 
     @classmethod
@@ -75,7 +76,8 @@ class BuildConfig:
         if archive_dir is not None:
             archive_dir = pathlib.Path(archive_dir)
 
-        static_libgfortran = os.environ.get("SIXS_STATIC_LIBGFORTRAN") == "1"
+        fc_override = os.environ.get("SIXS_FC_OVERRIDE")
+        fc_append = os.environ.get("SIXS_FC_APPEND")
 
         log_file = os.environ.get("SIXS_BUILD_LOG")
         if log_file is not None:
@@ -83,7 +85,8 @@ class BuildConfig:
 
         return cls(
             archive_dir=archive_dir,
-            static_libgfortran=static_libgfortran,
+            fc_override=fc_override,
+            fc_append=fc_append,
             log_file=log_file,
         )
 
@@ -247,10 +250,12 @@ def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> N
     if not src_dir.joinpath("Makefile").exists():
         raise BuildError(f"could not find Makefile in source directory '{src_dir}'")
 
-    fc_override = (
-        f"FC=gfortran -std=legacy -ffixed-line-length-none"
-        f" -ffpe-summary=none {'-static-libgfortran' if config.static_libgfortran else ''} $(FFLAGS)"
-    )
+    fc_override = config.fc_override
+    if fc_override is None:
+        fc_override = "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)"
+    if config.fc_append is not None:
+        fc_override += f" {config.fc_append}"
+
     make_command = ["make", "-j", "sixs", fc_override]
     logger.debug("running make command %r", make_command)
     try:
