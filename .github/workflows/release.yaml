@@ -58,11 +58,18 @@ jobs:
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
           SIXS_STATIC_LIBGFORTRAN: ${{ contains(matrix.os, 'windows') && '1' || '0' }}
+          SIXS_BUILD_LOG: ${{ matrix.os }}-buildpy.log
 
       - uses: actions/upload-artifact@v3
         with:
           name: dist-build
           path: dist
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: buildpy-logs
+          path: ${{ matrix.os }}-buildpy.log
           if-no-files-found: error
 
   tag_wheels:
