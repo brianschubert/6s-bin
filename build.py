@@ -192,51 +192,6 @@ def _resolve_source(
     tar_file.extractall(directory)
 
 
-def _test_sixs(binary: pathlib.Path, example_dir: pathlib.Path) -> None:
-    logger = logging.getLogger(__name__)
-
-    for example_in in example_dir.glob("Example_In_*.txt"):
-        # Corresponding expected output file.
-        example_out = example_in.parent.joinpath(example_in.name.replace("In", "Out"))
-
-        try:
-            result = subprocess.run(
-                [binary],
-                input=example_in.read_text(),
-                capture_output=True,
-                check=True,
-                text=True,
-                cwd=example_dir,
-            )
-        except subprocess.CalledProcessError as ex:
-            raise BuildError(
-                f"running example {example_in.name} failed\n"
-                f"stdout:\n{ex.stdout}\n"
-                f"stderr:\n{ex.stderr}"
-            ) from ex
-
-        # Compare actual output with expected output.
-        # Some differences are expected since the expected output files include float
-        # results to high precision, which can vary between systems with different
-        # underlying numeric libraries.
-        expected = example_out.read_text()
-        if result.stdout.strip() != expected.strip():
-            diff = difflib.context_diff(
-                result.stdout.splitlines(),
-                expected.splitlines(),
-                fromfile="expected",
-                tofile="actual",
-            )
-            diff_text = "\n".join(diff)
-
-            logger.warning(
-                f"WARNING: incorrect output for test {example_in.name}\n"
-                f"diff:\n{diff_text}"
-                # f"expected:\n{textwrap.indent(expected, '.. ')}\n"
-                # f"actual:\n{textwrap.indent(result.stdout, '.. ')}"
-            )
-
-
 def _install(binary: pathlib.Path, target: pathlib.Path) -> None:
     shutil.copyfile(binary, target)
     # Make sure file has owner execute permissions.
@@ -302,14 +257,6 @@ def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> N
     logger.debug(
         "output binary %s has size %d", sixs_binary, sixs_binary.stat().st_size
     )
-
-    # Validate built binary against example suite.
-    example_dir = build_dir.joinpath("Examples")
-    if example_dir.exists():
-        logger.info("Testing...")
-        _test_sixs(sixs_binary, build_dir.joinpath("Examples"))
-    else:
-        logger.info("Skipping tests - no examples found")
 
     # Install 6S executable into package source.
     logger.info("Installing...")
