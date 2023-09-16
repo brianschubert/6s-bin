@@ -1,7 +1,7 @@
 """
 Build script.
 
-Builds 6S in a temporary directory and it installs as a package resource.
+Builds 6S in a temporary directory and installs it as a package resource.
 """
 # Copyright (C) 2023 Brian Schubert.
 #
@@ -19,7 +19,6 @@ Builds 6S in a temporary directory and it installs as a package resource.
 
 from __future__ import annotations
 
-import difflib
 import hashlib
 import http
 import http.client
@@ -34,6 +33,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -52,20 +52,15 @@ class SixSTarget(NamedTuple):
     target_name: str
     "Name of this target's compiled 6S binary"
 
-    archive_url: str
+    archive_urls: list[str]
     """
-    URL to obtain 6S source archive from. 
+    URL(s) to obtain 6S source archive from. 
     
-    To avoid downloading a new copy, place the archive file in the distribution 
-    base directory.
+    To avoid downloading a new copy, configure a cache directory using SIXS_ARCHIVE_DIR.
     """
 
     archive_sha256: str
     """Expected SHA256 has of the 6S archive file as a 64-character hexstring."""
-
-    @property
-    def archive_name(self) -> str:
-        return pathlib.PurePath(urllib.parse.urlparse(self.archive_url).path).name
 
 
 @dataclass
@@ -108,21 +103,30 @@ class WrapFormatter(logging.Formatter):
 TARGETS: Final = [
     SixSTarget(
         target_name="sixsV1.1",
-        # From Py6S author's website.
-        # archive_url = "https://rtwilson.com/downloads/6SV-1.1.tar",
-        # Mirror from archive.org snapshot.
-        archive_url="https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar",
+        archive_urls=[
+            # Mirror from archive.org snapshot.
+            "https://web.archive.org/web/20220912090811if_/https://rtwilson.com/downloads/6SV-1.1.tar",
+            # From Py6S author's website.
+            "https://rtwilson.com/downloads/6SV-1.1.tar",
+        ],
         archive_sha256="eedf652e6743b3991b5b9e586da2f55c73f9c9148335a193396bf3893c2bc88f",
     ),
     SixSTarget(
         target_name="sixsV2.1",
-        # From SALSA website.
-        # archive_url="https://salsa.umd.edu/files/6S/6sV2.1.tar",
-        # Mirror from archive.org snapshot.
-        archive_url="https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar",
+        archive_urls=[
+            # Mirror from archive.org snapshot.
+            "https://web.archive.org/web/20220909154857if_/https://salsa.umd.edu/files/6S/6sV2.1.tar",
+            # From SALSA website.
+            "https://salsa.umd.edu/files/6S/6sV2.1.tar",
+        ],
         archive_sha256="42422db29c095a49eaa98556b416405eb818be1ee30139d2a1913dbf3b0c7de1",
     ),
 ]
+
+
+def _url_filename(url: str) -> str:
+    """Extract filename from URL."""
+    return pathlib.PurePath(urllib.parse.urlparse(url).path).name
 
 
 def _assert_detect_command(cmd: list[str]) -> None:
@@ -153,32 +157,45 @@ def _resolve_source(
     """
     logger = logging.getLogger(__name__)
 
-    if (
-        archive_directory is not None
-        and (
-            archive_path := pathlib.Path(archive_directory).joinpath(
-                target.archive_name
-            )
-        ).exists()
-    ):
-        logger.info(f"Using cached source '{archive_path}'")
+    for archive_url in target.archive_urls:
+        logger.debug("Trying archive source '%s'", archive_url)
+        archive_name = _url_filename(archive_url)
 
-        sixs_archive = archive_path.read_bytes()
+        # Check for cached archive.
+        if (
+            archive_directory is not None
+            and (cached_archive := archive_directory.joinpath(archive_name)).exists()
+        ):
+            logger.info(f"Using cached source '{cached_archive}'")
+            sixs_source = cached_archive.read_bytes()
+            break
 
-    else:
         # No cached source - download fresh copy.
-        logger.info(f"Downloading 6S archive from '{target.archive_url}'")
 
-        response: http.client.HTTPResponse = urllib.request.urlopen(target.archive_url)
-        if response.status != http.HTTPStatus.OK.value:
-            raise BuildError(
-                f"failed to download 6S archive - got response "
-                f"{response.status} {response.reason}"
-            )
-        sixs_archive = response.read()
+        logger.debug(
+            "no cached archive found for %s in '%s'", archive_name, archive_directory
+        )
+        logger.info(f"Downloading 6S archive from '{archive_url}'")
+
+        try:
+            response: http.client.HTTPResponse = urllib.request.urlopen(archive_url)
+        except urllib.error.URLError as ex:
+            logger.warning("failed to access '%s'", archive_url, exc_info=ex)
+            continue
+
+        if response.status == http.HTTPStatus.OK.value:
+            sixs_source = response.read()
+            break
+
+        logger.warning(
+            f"failed to download 6S archive - got response "
+            f"{response.status} {response.reason}"
+        )
+    else:
+        raise BuildError("failed to retrieve 6S source")
 
     logger.debug("validating archive against expected hash %r", target.archive_sha256)
-    digest = hashlib.sha256(sixs_archive).hexdigest()
+    digest = hashlib.sha256(sixs_source).hexdigest()
     if digest != target.archive_sha256:
         raise BuildError(
             f"6S archive hash validation failed. "
@@ -186,8 +203,8 @@ def _resolve_source(
         )
 
     logger.info(f"Extracting source...")
-    logger.debug("Extracting %d byte payload to '%s'", len(sixs_archive), directory)
-    buffer = io.BytesIO(sixs_archive)
+    logger.debug("Extracting %d byte payload to '%s'", len(sixs_source), directory)
+    buffer = io.BytesIO(sixs_source)
     tar_file = tarfile.open(fileobj=buffer, mode="r:")
     tar_file.extractall(directory)
 
