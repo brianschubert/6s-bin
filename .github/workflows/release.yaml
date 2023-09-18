@@ -1,5 +1,7 @@
 name: Release
 
+run-name: Release from ${{ github.ref }}
+
 on: [ workflow_dispatch ]
 
 jobs:
@@ -19,6 +21,10 @@ jobs:
         with:
           name: dist-release
           path: dist
+
+      # Allow the same distribution version to be test-published multiple times.
+      - name: Rename wheels with build number
+        run: rename 's/py3/${{ github.run_number }}-py3/' dist/*.whl
 
       - name: Publish distributions to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
