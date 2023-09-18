@@ -1,12 +1,6 @@
 name: Release
 
-on:
-  push:
-    branches:
-      - 'develop'
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'  # Only run for full release tags
-  workflow_dispatch: ~
+on: [ workflow_dispatch ]
 
 jobs:
 
@@ -15,7 +9,7 @@ jobs:
 
   test-publish:
     needs: build
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+#    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -49,15 +43,6 @@ jobs:
       - name: Install distribution from TestPyPI
         run: pip install --no-deps -i https://test.pypi.org/simple/ 6s-bin
 
-      - name: Verify that installed distribution version matches tag
-        run: >
-          python -c 'import sixs_bin;
-          expected_ref = f"refs/tags/v{sixs_bin.__version__}";
-          actual_ref="${{ github.ref }}";
-          print(f"{expected_ref=} {actual_ref=}");
-          assert expected_ref == actual_ref
-          '
-
       - name: Install dependencies from PyPI
         if: ${{ !contains(matrix.os, 'windows') }}
         run: |
@@ -69,6 +54,15 @@ jobs:
           $output = python -m pip install '6s-bin[wrapper]' | Out-String
           Write-Host $output
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
+
+      - name: Verify that installed distribution version matches tag
+        run: >
+          python -c 'import sixs_bin;
+          expected_ref = f"refs/tags/v{sixs_bin.__version__}";
+          actual_ref="${{ github.ref }}";
+          print(f"{expected_ref=} {actual_ref=}");
+          assert expected_ref == actual_ref
+          '
 
       - name: Run wrapper test
         run: python -m sixs_bin --test-wrapper
