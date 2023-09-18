@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "6s-bin"
-version = "0.10.0-dev"
+version = "0.10.0"
 description = "Compiled binaries for the 6S Radiative Transfer Model exposed as package resources."
 license = "Apache-2.0"
 authors = ["Brian Schubert <schubert.b@northeastern.edu>"]
