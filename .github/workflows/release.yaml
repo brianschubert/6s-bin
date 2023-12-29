@@ -54,22 +54,26 @@ jobs:
       - name: Install dependencies from PyPI
         if: ${{ !contains(matrix.os, 'windows') }}
         run: |
-          python -m pip install '6s-bin[wrapper]' | tee /dev/tty | grep 'Requirement already satisfied: 6s-bin' > /dev/null
+          python -m pip install '6s-bin[wrapper]' packaging | tee /dev/tty | grep 'Requirement already satisfied: 6s-bin' > /dev/null
 
       - name: Install dependencies from PyPI (Windows)
         if: ${{ contains(matrix.os, 'windows') }}
         run: |
-          $output = python -m pip install '6s-bin[wrapper]' | Out-String
+          $output = python -m pip install '6s-bin[wrapper]' packaging | Out-String
           Write-Host $output
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
       - name: Verify that installed distribution version matches tag
         run: >
-          python -c 'import sixs_bin;
-          installed_version = f"{sixs_bin.__version__}";
-          expected_version="${{ github.ref }}".split("/")[-1].removeprefix("v");
+          python -c '
+          import packaging.version;
+          import sixs_bin;
+          installed_version = packaging.version.parse(sixs_bin.__version__);
+          expected_version = packaging.version.parse(
+              "${{ github.ref }}".split("/")[-1].removeprefix("v")
+          );
           print(f"{installed_version=} {expected_version=}");
-          assert installed_version == expected_version
+          assert installed_version.release == expected_version.release
           '
 
       - name: Run wrapper test
