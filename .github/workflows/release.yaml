@@ -22,11 +22,11 @@ jobs:
           name: dist-release
           path: dist
 
-      # Allow the same distribution version to be test-published multiple times.
-      # Useful for prototyping the release process.
-      - name: Rename wheels with build number
-        # language=sh
-        run: for file in dist/*.whl; do mv "$file" "${file//py3/${{ github.run_number }}-py3}"; done
+#      # Allow the same distribution version to be test-published multiple times.
+#      # Useful for prototyping the release process.
+#      - name: Rename wheels with build number
+#        # language=sh
+#        run: for file in dist/*.whl; do mv "$file" "${file//py3/${{ github.run_number }}-py3}"; done
 
       - name: Publish distributions to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
