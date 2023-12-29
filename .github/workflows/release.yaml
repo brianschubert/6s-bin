@@ -66,9 +66,9 @@ jobs:
       - name: Verify that installed distribution version matches tag
         run: >
           python -c 'import sixs_bin;
-          expected_ref = f"refs/tags/v{sixs_bin.__version__}";
-          actual_ref="${{ github.ref }}";
-          print(f"{expected_ref=} {actual_ref=}");
+          installed_version = f"{sixs_bin.__version__}";
+          expected_version="${{ github.ref }}".split("/")[-1].removeprefix("v");
+          print(f"{installed_version=} {expected_version=}");
           assert expected_ref == actual_ref
           '
 
