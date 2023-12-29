@@ -49,7 +49,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install distribution from TestPyPI
-        run: pip install --no-deps -i https://test.pypi.org/simple/ 6s-bin
+        run: pip install --pre --no-deps -i https://test.pypi.org/simple/ 6s-bin
 
       - name: Install dependencies from PyPI
         if: ${{ !contains(matrix.os, 'windows') }}
@@ -69,7 +69,7 @@ jobs:
           installed_version = f"{sixs_bin.__version__}";
           expected_version="${{ github.ref }}".split("/")[-1].removeprefix("v");
           print(f"{installed_version=} {expected_version=}");
-          assert expected_ref == actual_ref
+          assert installed_version == expected_version
           '
 
       - name: Run wrapper test
