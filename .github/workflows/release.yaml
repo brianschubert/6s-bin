@@ -65,8 +65,7 @@ jobs:
 
       - name: Verify that installed distribution version matches tag
         run: >
-          python -c '
-          import packaging.version;
+          python -c 'import packaging.version;
           import sixs_bin;
           installed_version = packaging.version.parse(sixs_bin.__version__);
           expected_version = packaging.version.parse("${{ github.ref }}".split("/")[-1].removeprefix("v"));
