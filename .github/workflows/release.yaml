@@ -69,9 +69,7 @@ jobs:
           import packaging.version;
           import sixs_bin;
           installed_version = packaging.version.parse(sixs_bin.__version__);
-          expected_version = packaging.version.parse(
-              "${{ github.ref }}".split("/")[-1].removeprefix("v")
-          );
+          expected_version = packaging.version.parse("${{ github.ref }}".split("/")[-1].removeprefix("v"));
           print(f"{installed_version=} {expected_version=}");
           assert installed_version.release == expected_version.release
           '
