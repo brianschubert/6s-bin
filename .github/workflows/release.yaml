@@ -41,21 +41,25 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install distribution from TestPyPI
+        # language=sh
         run: pip install --no-deps -i https://test.pypi.org/simple/ 6s-bin
 
       - name: Install dependencies from PyPI
         if: ${{ !contains(matrix.os, 'windows') }}
+        # language=sh
         run: |
           python -m pip install '6s-bin[wrapper]' | tee /dev/tty | grep 'Requirement already satisfied: 6s-bin' > /dev/null
 
       - name: Install dependencies from PyPI (Windows)
         if: ${{ contains(matrix.os, 'windows') }}
+        # language=sh
         run: |
           $output = python -m pip install '6s-bin[wrapper]' | Out-String
           Write-Host $output
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
       - name: Verify that installed distribution version matches tag
+        # language=sh
         run: >
           python -c 'import sixs_bin;
           expected_ref = f"refs/tags/v{sixs_bin.__version__}";
@@ -65,4 +69,5 @@ jobs:
           '
 
       - name: Run wrapper test
+        # language=sh
         run: python -m sixs_bin --test-wrapper

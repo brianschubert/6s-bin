@@ -38,6 +38,7 @@ jobs:
         uses: awvwgk/setup-fortran@v1
 
       - name: Install build frontend
+        # language=sh
         run: python -m pip install --upgrade pip build
 
       - name: Retrieve 6S source archives
@@ -51,6 +52,7 @@ jobs:
       # from the sdist. In all other jobs, the wheel is built directly from the source directory.
       # This way, we confirm that wheels can be successfully built from the sdist.
       - name: Build wheel${{ matrix.sdist && ' and sdist' || '' }}
+        # language=sh
         run: python -I -m build ${{ !matrix.sdist && '--wheel' || '' }}
         env:
           SIXS_ARCHIVE_DIR: 6s-archives
@@ -84,6 +86,7 @@ jobs:
           python-version: "3.11"
 
       - name: Configure wheel platform compatibility tags
+        # language=sh
         run: |
           python -m pip install --upgrade wheel
           python -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
@@ -119,6 +122,7 @@ jobs:
       #   --only-binary - use a wheel (not sdist)
       #   --no-deps     - only install named distribution (do not try to find other dependencies)
       - name: Install candidate wheel without dependencies
+        # language=sh
         run: python -m pip install --no-index --only-binary ':all:' --no-deps --find-links=dist 6s-bin
 
       # Install remaining dependency from PyPI, including those for the 'wrapper' extra.
@@ -126,11 +130,13 @@ jobs:
       # status if `...` is not found in the output.
       - name: Install candidate wheel's dependencies from PyPI
         if: ${{ !contains(matrix.os, 'windows') }}
+        # language=sh
         run: |
           python -m pip install --find-links=dist '6s-bin[wrapper]' | tee /dev/tty | grep 'Requirement already satisfied: 6s-bin' > /dev/null
 
       - name: Install candidate wheel's dependencies from PyPI (Windows)
         if: ${{ contains(matrix.os, 'windows') }}
+        # language=sh
         run: |
           $output = python -m pip install --find-links=dist '6s-bin[wrapper]' | Out-String
           Write-Host $output
@@ -141,7 +147,7 @@ jobs:
           sparse-checkout: test
 
       - name: Run pytest
+        # language=sh
         run: |
           python -m pip install pytest
           pytest
-
