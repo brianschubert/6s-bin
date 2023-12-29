@@ -64,6 +64,8 @@ jobs:
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
       - name: Verify that installed distribution version matches tag
+        # TODO find fix for double-quotes being stripped when the below command is run in PowerShell.
+        if: ${{ !contains(matrix.os, 'windows') }}
         run: >
           python -c 'import packaging.version;
           import sixs_bin;
