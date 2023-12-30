@@ -99,17 +99,18 @@ jobs:
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
       - name: Verify that installed distribution version matches tag
-        # TODO find fix for double-quotes being stripped when the below command is run in PowerShell.
-        if: ${{ !contains(matrix.os, 'windows') }}
-        # language=sh
-        run: >
-          python -c 'import packaging.version;
-          import sixs_bin;
-          installed_version = packaging.version.parse(sixs_bin.__version__);
-          expected_version = packaging.version.parse("${{ github.ref }}".split("/")[-1].removeprefix("v"));
-          print(f"{installed_version=} {expected_version=}");
+        shell: python
+        # language=python
+        run: |
+          import packaging.version
+          import sixs_bin
+          
+          installed_version = packaging.version.parse(sixs_bin.__version__)
+          expected_version = packaging.version.parse("${{ github.ref }}".split("/")[-1].removeprefix("v"))
+          
+          print(f"::notice::{installed_version=} {expected_version=}")
+          
           assert installed_version.release == expected_version.release
-          '
 
       # Quick final self-check.
       - name: Run wrapper test
