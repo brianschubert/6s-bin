@@ -24,6 +24,7 @@ jobs:
         url: ${{ fromJSON(inputs.urls) }}
     steps:
       - name: Download file
+        # language=sh
         run:
           curl --create-dirs --output-dir artifacts -O ${{ matrix.url }}
       - uses: actions/upload-artifact@v3
