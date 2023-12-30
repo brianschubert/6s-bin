@@ -22,6 +22,25 @@ jobs:
           name: dist-release
           path: dist
 
+       # Verify that the version tag on all distribution files matches current pushes
+      - name: Check version consistency
+        # language=sh
+        run: |
+          tag_prefix="refs/tags/"
+          pushed_ref="${{ github.ref }}"
+          expected_version="${pushed_ref#${tag_prefix}}"
+          
+          for dist_file in ./dist/*; do
+              dist_version=$(echo ${dist_file} | cut -d'-' -f2)
+            
+              echo "::notice file=${dist_file}:: found version ${dist_version}"
+          
+              if [ "${expected_vrsion}" != "${dist_version}" ]; then
+                echo "::error:: expected ${expected_vrsion}, got ${dist_version} in distribution file '${dist_file}'"
+                exit 1
+              fi
+          done
+
 #      # Allow the same distribution version to be test-published multiple times.
 #      # Useful for prototyping the release process.
 #      - name: Rename wheels with build number
