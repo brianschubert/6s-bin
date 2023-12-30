@@ -33,7 +33,7 @@ jobs:
       - name: Check version consistency
         # language=sh
         run: |
-          tag_prefix="refs/tags/"
+          tag_prefix="refs/tags/v"
           pushed_ref="${{ github.ref }}"
           expected_version="${pushed_ref#${tag_prefix}}"
           
