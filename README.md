@@ -1,6 +1,6 @@
 # 6S Binaries
 
-[![release workflow](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml)
+[![release workflow](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml/badge.svg?event=push)](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml)
 [![tests workflow](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml)
 [![License](https://img.shields.io/github/license/brianschubert/6s-bin)](./LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
