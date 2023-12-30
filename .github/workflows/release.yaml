@@ -40,9 +40,9 @@ jobs:
           echo "::notice:: expected version is ${expected_version} for ref ${pushed_ref}"
           
           for dist_file in ./dist/*; do
-              dist_version=$(echo ${dist_file} | cut -d'-' -f2)
+              dist_version=$(echo ${dist_file%.tar.gz} | cut -d'-' -f2)
             
-              echo "::notice:: found version ${dist_version} for file '${dist_file}'"
+              echo "::debug:: found version ${dist_version} for file '${dist_file}'"
           
               if [ "${expected_version}" != "${dist_version}" ]; then
                 echo "::error:: expected ${expected_version}, got ${dist_version} in distribution file '${dist_file}'"
