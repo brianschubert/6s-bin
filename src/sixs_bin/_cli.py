@@ -16,7 +16,6 @@ Command line interface.
 # limitations under the License.
 
 import argparse
-import os
 import pathlib
 import subprocess
 import sys
