@@ -37,13 +37,15 @@ jobs:
           pushed_ref="${{ github.ref }}"
           expected_version="${pushed_ref#${tag_prefix}}"
           
+          echo "::notice:: expected version is ${expected_version} for ref ${pushed_ref}"
+          
           for dist_file in ./dist/*; do
               dist_version=$(echo ${dist_file} | cut -d'-' -f2)
             
-              echo "::notice file=${dist_file}:: found version ${dist_version}"
+              echo "::notice:: found version ${dist_version} for file '${dist_file}'"
           
-              if [ "${expected_vrsion}" != "${dist_version}" ]; then
-                echo "::error:: expected ${expected_vrsion}, got ${dist_version} in distribution file '${dist_file}'"
+              if [ "${expected_version}" != "${dist_version}" ]; then
+                echo "::error:: expected ${expected_version}, got ${dist_version} in distribution file '${dist_file}'"
                 exit 1
               fi
           done
