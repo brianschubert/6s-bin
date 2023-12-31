@@ -135,10 +135,10 @@ def test_installed_matches(sixs_version, manual_input_file, helpers) -> None:
     }
 
     sixs_binary = sixs_bin.get_path(sixs_version)
+    script_name = f"{sixs_binary.name}{'.exe' if _is_windows() else ''}"
 
     direct_result = subprocess.run([sixs_binary], **proc_args)
-
-    installed_result = subprocess.run([sixs_binary.name], **proc_args)
+    installed_result = subprocess.run([script_name], **proc_args)
 
     assert direct_result.returncode == installed_result.returncode
 
@@ -152,3 +152,7 @@ def test_installed_matches(sixs_version, manual_input_file, helpers) -> None:
 
     for d_line, i_line in zip(direct_lines, installed_lines):
         helpers.assert_embedded_isclose(d_line, i_line, rel_tol=rel_tol)
+
+
+def _is_windows() -> bool:
+    return sys.platform == "win32"
