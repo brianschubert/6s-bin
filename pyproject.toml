@@ -46,6 +46,10 @@ py6s = "^1.9.2"
 [tool.poetry.extras]
 wrapper = ["py6s", "python-dateutil"]
 
+[tool.poetry.scripts]
+"sixsV1.1" = "sixs_bin._installer:_inplace_install_11"
+"sixsV2.1" = "sixs_bin._installer:_inplace_install_21"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
