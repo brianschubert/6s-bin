@@ -17,7 +17,14 @@ def _main_path() -> pathlib.Path:
         raise RuntimeError(
             f"__main__ module {main} is missing __file__ - cannot retrieve path to __main__"
         )
-    return pathlib.Path(main.__file__).resolve()
+
+    path = pathlib.Path(main.__file__).resolve()
+
+    # Handle .exe console scripts on Windows, where __file__ will be 'some\path\file.exe\__main__.py'.
+    if path.parent.name.endswith(".exe"):
+        path = path.parent
+
+    return path
 
 
 def _install(src: pathlib.Path, target: pathlib.Path) -> None:
