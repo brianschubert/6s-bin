@@ -82,4 +82,5 @@ def _run_inplace_install(src: pathlib.Path, target: pathlib.Path) -> None:
         file=sys.stderr,
         flush=True,
     )
-    subprocess.run([target, *sys.argv[1:]])
+
+    sys.exit(subprocess.run([target, *sys.argv[1:]]).returncode)
