@@ -46,7 +46,7 @@ def _make_parser() -> argparse.ArgumentParser:
         "--exec",
         choices=sixs_bin._SIXS_BINARIES.keys(),
         help="Execute specified 6S executable in a subprocess, inheriting stdin and stdout. This option is provided"
-        " as a convenience, but its use is not recommended. Running 6S using this option is about 5%% slower than"
+        " as a convenience, but its not generally recommended. Running 6S using this option is around 5%% slower than"
         " executing the binary directly, due the overhead of starting the Python interpreter and subprocess.",
     )
     command_group.add_argument(

@@ -8,7 +8,11 @@
 
 This distribution provides access to compiled binaries of the [6S Radiative Transfer Model](https://salsa.umd.edu/6spage.html) as [package resources](https://docs.python.org/3/library/importlib.resources.html#module-importlib.resources).
 
-Currently provides binaries for 6SV1.1 and 6SV2.1. Supports Linux, macOS, and Windows.
+
+
+It *does not* provide a Python interface to 6S. For a Python interface, see  Robin Wilson's [Py6S].
+
+Currently, this project includes binaries for 6SV1.1 and 6SV2.1. It supports Linux, macOS, and Windows.
 
 ## Install
 
@@ -56,7 +60,7 @@ If you also have [Py6S][Py6S] installed, you can call `sixs_bin.make_wrapper()` 
 PosixPath('<path to virtual environment>/lib/python3.X/site-packages/sixs_bin/sixsV1.1')
 
 >>> wrapper.run()
->>> print(wrapper.outputs.apparent_radiance)
+>>> wrapper.outputs.apparent_radiance
 134.632
 ```
 
@@ -65,7 +69,8 @@ PosixPath('<path to virtual environment>/lib/python3.X/site-packages/sixs_bin/si
 Run `python3 -m sixs_bin --help` to see all available command line options.
 ```none
 $ python3 -m sixs_bin --help
-usage: python3 -m sixs_bin [-h] [--version] [--path {1.1,2.1} | --exec {1.1,2.1} | --test-wrapper]
+usage: python3 -m sixs_bin [-h] [--version]
+                           [--path {1.1,2.1} | --exec {1.1,2.1} | --test-wrapper]
 
 6S v1.1 and 6S v2.1 binaries provided as package resources.
 
@@ -74,13 +79,14 @@ optional arguments:
   --version         show program's version number and exit
 
 command:
-  --path {1.1,2.1}  Print the path to the specified 6S executable from this package's resources.
-  --exec {1.1,2.1}  Execute specified 6S executable in a subprocess, inheriting stdin and stdout. This
-                    option is provided as a convenience, but its use is not recommended. Running 6S using
-                    this option is about 5% slower than executing the binary directly, due the overhead of
+  --path {1.1,2.1}  Print the path to the specified 6S executable from this package's
+                    resources.
+  --exec {1.1,2.1}  Execute specified 6S executable in a subprocess, inheriting stdin and
+                    stdout. This option is provided as a convenience, but its not
+                    generally recommended. Running 6S using this option is around 5%
+                    slower than executing the binary directly, due the overhead of
                     starting the Python interpreter and subprocess.
   --test-wrapper    Run Py6S.SixS.test on this package's 6SV1.1 executable.
-
 ```
 
 To get the path to an installed 6S binary, run `sixs_bin` as an executable module with the `--path` flag specified. The `--path` flag takes one required argument, which must be either the string `1.1` or `2.1`:
