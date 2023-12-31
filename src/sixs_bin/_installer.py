@@ -64,11 +64,15 @@ def _run_inplace_install(src: pathlib.Path, target: pathlib.Path) -> None:
         _install(src, target)
     except OSError:
         print(
-            "error: first-run installation failed! See accompanying exception traceback."
+            "error: first-run installation failed! See accompanying exception traceback.",
+            file=sys.stderr,
+            flush=True,
         )
         raise
 
     print(
-        "First-run installation succeeded! Launching 6S in a subprocess. All future runs will execute 6S directly."
+        "First-run installation succeeded! Launching 6S in a subprocess. All future runs will execute 6S directly.",
+        file=sys.stderr,
+        flush=True,
     )
     subprocess.run([target, *sys.argv[1:]])
