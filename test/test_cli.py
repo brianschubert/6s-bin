@@ -119,3 +119,36 @@ def test_test_wrapper() -> None:
         sixs_cli.main(["--test-wrapper"])
 
     assert exec_info.value.code == 0
+
+
+def test_installed_matches(sixs_version, manual_input_file, helpers) -> None:
+    """
+    Verify that the behavior of the binary installed on the PATH matches the
+    behavior of directly calling the package resource binary.
+    """
+    proc_args = {
+        "input": manual_input_file,
+        "capture_output": True,
+        "check": True,
+        "text": True,
+        "encoding": "ascii",
+    }
+
+    sixs_binary = sixs_bin.get_path(sixs_version)
+
+    direct_result = subprocess.run([sixs_binary], **proc_args)
+
+    installed_result = subprocess.run([sixs_binary.name], **proc_args)
+
+    assert direct_result.returncode == installed_result.returncode
+
+    direct_lines = direct_result.stdout.splitlines()
+    installed_lines = installed_result.stdout.splitlines()
+    assert len(direct_lines) == len(installed_lines)
+
+    # Use more generous tolerance on macOS and Windows, where rounding differences between
+    # runs have been observed.
+    rel_tol = 1e-3 if sys.platform in ("darwin", "win32") else 1e-09
+
+    for d_line, i_line in zip(direct_lines, installed_lines):
+        helpers.assert_embedded_isclose(d_line, i_line, rel_tol=rel_tol)
