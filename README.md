@@ -2,6 +2,7 @@
 
 [![release workflow](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml/badge.svg?event=push)](https://github.com/brianschubert/6s-bin/actions/workflows/release.yaml)
 [![tests workflow](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml/badge.svg)](https://github.com/brianschubert/6s-bin/actions/workflows/test.yaml)
+[![PyPI - Version](https://img.shields.io/pypi/v/6s-bin)](https://pypi.org/project/6s-bin)
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/brianschubert/6s-bin/develop)](https://github.com/brianschubert/6s-bin/commits/develop)
 [![License](https://img.shields.io/github/license/brianschubert/6s-bin)](./LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
