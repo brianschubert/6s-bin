@@ -1,3 +1,7 @@
+# Download files from the web and upload them as workflow artifacts.
+#
+# Intended to save time and bandwidth from having to download the same file multiple times in a single workflow run.
+
 name: Web artifacts
 
 on:

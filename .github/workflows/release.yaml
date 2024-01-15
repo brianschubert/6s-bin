@@ -1,3 +1,5 @@
+# Build, test, and publish built distributions to {Test,}PyPI on tag push.
+
 name: Release
 
 run-name: Release from ${{ github.ref }}

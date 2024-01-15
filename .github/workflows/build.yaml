@@ -1,3 +1,5 @@
+# Build, and test a set of distribution files.
+
 name: Build
 
 on: [ workflow_call, workflow_dispatch ]
