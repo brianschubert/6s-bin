@@ -2,7 +2,7 @@
 
 name: Tests
 
-run-name: Test ${{ github.event.ref}}${{ github.event_name == 'push' && ' - ${{ github.event.head_commit.message }}' || '' }}
+run-name: Test ${{ github.event.ref}}${{ github.event_name == 'push' && format(' - {0}', github.event.head_commit.message) || '' }}
 
 on:
   push:
