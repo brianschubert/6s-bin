@@ -1,3 +1,5 @@
+# Run test suite.
+
 name: Tests
 
 run-name: Test ${{ github.event.ref}}${{ github.event_name == 'push' && ' - ${{ github.event.head_commit.message }}' || '' }}

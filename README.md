@@ -9,22 +9,30 @@
 
 This distribution provides access to compiled binaries of the [6S Radiative Transfer Model](https://salsa.umd.edu/6spage.html) as [package resources](https://docs.python.org/3/library/importlib.resources.html#module-importlib.resources).
 
-
-
 It *does not* provide a Python interface to 6S. For a Python interface, see  Robin Wilson's [Py6S].
 
-Currently, this project includes binaries for 6SV1.1 and 6SV2.1. It supports Linux, macOS, and Windows.
+Currently, this project includes binaries for 6SV1.1 and 6SV2.1. It requires Python 3.9+ and supports Linux, macOS, and Windows.
 
 ## Install
 
-Pre-compiled development wheels can be installed from [TestPyPI](https://test.pypi.org/project/6s-bin/):
+Pre-compiled wheels can be installed from [PyPI](https://pypi.org/project/6s-bin/):
 ```shell
-$ pip install -i https://test.pypi.org/simple/ 6s-bin
+$ pip install 6s-bin
+```
+If you are using [poetry](https://python-poetry.org/), you can add this distribution as a dependency using 
+`poetry add`:
+```shell
+$ poetry add 6s-bin
 ```
 
 ### Installing from source
 
 Building this distribution involves downloading, validating, and compiling the 6S source code. See [`build.py`](./build.py) for details about the build process. A Fortran 77 compiler is required to compile 6S.
+
+Build and install from source distribution:
+```shell
+$ pip install --no-binary=6s-bin 6s-bin
+```
 
 Build and install from git:
 ```shell
