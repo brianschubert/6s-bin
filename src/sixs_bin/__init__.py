@@ -22,10 +22,10 @@ import importlib.resources
 import pathlib
 from typing import TYPE_CHECKING, Final, Literal
 
-# Py6S may not be installed.
 if TYPE_CHECKING:
     from importlib.abc import Traversable
 
+    # Py6S may not be installed.
     from Py6S import SixS
     from typing_extensions import TypeAlias
 
