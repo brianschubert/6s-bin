@@ -33,6 +33,6 @@ jobs:
           curl --create-dirs --output-dir artifacts -O ${{ matrix.url }}
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.name }}-${{ matrix.url }}
+          name: ${{ inputs.name }}-${{ hashFiles('artifacts/*') }}
           path: artifacts
           retention-days: ${{ inputs.retention-days }}
