@@ -31,7 +31,7 @@ jobs:
         # language=sh
         run:
           curl --create-dirs --output-dir artifacts -O ${{ matrix.url }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.name }}
           path: artifacts

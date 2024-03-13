@@ -29,10 +29,10 @@ jobs:
           - os: ubuntu-latest
             sdist: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -44,7 +44,7 @@ jobs:
         run: python -m pip install --upgrade pip build
 
       - name: Retrieve 6S source archives
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: 6s-archives
           path: 6s-archives
@@ -61,13 +61,13 @@ jobs:
           SIXS_FC_APPEND: ${{ contains(matrix.os, 'windows') && '-static' || null }}
           SIXS_BUILD_LOG: ${{ github.workspace }}/${{ matrix.os }}-buildpy.log
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist-build
           path: dist
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: buildpy-logs
           path: ${{ matrix.os }}-buildpy.log
@@ -77,13 +77,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist-build
           path: dist
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -93,7 +93,7 @@ jobs:
           python -m pip install --upgrade wheel
           python -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist-release
           path: dist
@@ -110,11 +110,11 @@ jobs:
         python-version: [ "3.9", "3.10", "3.11", "3.12" ]
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist-release
           path: dist
@@ -144,7 +144,7 @@ jobs:
           Write-Host $output
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           sparse-checkout: test
 
