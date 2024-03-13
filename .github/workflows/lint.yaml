@@ -1,0 +1,22 @@
+# Run pre-commit lints on push.
+# Based on https://github.com/python/cpython/blob/main/.github/workflows/lint.yml
+
+name: Lint
+
+on: [ push ]
+
+env:
+  FORCE_COLOR: 1
+  RUFF_OUTPUT_FORMAT: github
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - uses: pre-commit/action@v3.0.1
