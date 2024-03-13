@@ -39,14 +39,14 @@ jobs:
           tag_prefix="refs/tags/v"
           pushed_ref="${{ github.ref }}"
           expected_version="${pushed_ref#${tag_prefix}}"
-          
+
           echo "::notice:: expected version is ${expected_version} for ref ${pushed_ref}"
-          
+
           for dist_file in ./dist/*; do
               dist_version=$(echo ${dist_file%.tar.gz} | cut -d'-' -f2)
-            
+
               echo "::debug:: found version ${dist_version} for file '${dist_file}'"
-          
+
               if [ "${expected_version}" != "${dist_version}" ]; then
                 echo "::error:: expected ${expected_version}, got ${dist_version} in distribution file '${dist_file}'"
                 exit 1
@@ -109,12 +109,12 @@ jobs:
         run: |
           import packaging.version
           import sixs_bin
-          
+
           installed_version = packaging.version.parse(sixs_bin.__version__)
           expected_version = packaging.version.parse("${{ github.ref }}".split("/")[-1].removeprefix("v"))
-          
+
           print(f"::notice::{installed_version=} {expected_version=}")
-          
+
           assert installed_version.release == expected_version.release
 
       # Quick final self-check.

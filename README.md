@@ -19,7 +19,7 @@ Pre-compiled wheels can be installed from [PyPI](https://pypi.org/project/6s-bin
 ```shell
 $ pip install 6s-bin
 ```
-If you are using [poetry](https://python-poetry.org/), you can add this distribution as a dependency using 
+If you are using [poetry](https://python-poetry.org/), you can add this distribution as a dependency using
 `poetry add`:
 ```shell
 $ poetry add 6s-bin

@@ -64,7 +64,7 @@ def test_basic_run(sixs_binary, manual_input_file) -> None:
 
 def test_wrapper() -> None:
     """Verify that ``Py6S.SixS.test`` run successfully if ``Py6S`` is available."""
-    Py6S = pytest.importorskip("Py6S")
+    Py6S = pytest.importorskip("Py6S")  # noqa: N806
 
     wrapper = sixs_bin.make_wrapper()
     assert Py6S.SixS.test(wrapper.sixs_path) == 0

@@ -20,13 +20,12 @@ from __future__ import annotations
 import importlib.metadata
 import importlib.resources
 import pathlib
-from importlib.abc import Traversable
-from typing import TYPE_CHECKING, Final, Literal
-
-from typing_extensions import TypeAlias
+from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 # Py6S may not be installed.
 if TYPE_CHECKING:
+    from importlib.abc import Traversable
+
     from Py6S import SixS
 
 SixSVersion: TypeAlias = Literal["1.1", "2.1"]
@@ -50,7 +49,8 @@ def get_path(version: SixSVersion) -> pathlib.Path:
         binary = _SIXS_BINARIES[version]
     except KeyError as ex:
         raise ValueError(
-            f"invalid 6S version '{version}' - must be one of {list(_SIXS_BINARIES.keys())}"
+            f"invalid 6S version '{version}'"
+            f" - must be one of {list(_SIXS_BINARIES.keys())}"
         ) from ex
 
     if not isinstance(binary, pathlib.Path):

@@ -17,7 +17,7 @@ def _run_self_subprocess(
     Needed instead of calling the CLI entrypoint directly when more advanced control
     over the process running the command line interface is required.
     """
-    return subprocess.run(
+    return subprocess.run(  # noqa: PLW1510
         [sys.executable, "-m", sixs_bin.__name__, *cli_args], **kwargs
     )
 
@@ -65,7 +65,9 @@ def test_exec_matches(sixs_version, manual_input_file, helpers) -> None:
         "encoding": "ascii",
     }
 
-    direct_result = subprocess.run([sixs_bin.get_path(sixs_version)], **proc_args)
+    direct_result = subprocess.run(  # noqa: PLW1510
+        [sixs_bin.get_path(sixs_version)], **proc_args
+    )
 
     cli_result = _run_self_subprocess(["--exec", sixs_version], **proc_args)
 
@@ -76,11 +78,11 @@ def test_exec_matches(sixs_version, manual_input_file, helpers) -> None:
     cli_lines = cli_result.stdout.splitlines()
     assert len(direct_lines) == len(cli_lines)
 
-    # Use more generous tolerance on macOS and Windows, where rounding differences between
-    # runs have been observed.
+    # Use more generous tolerance on macOS and Windows, where rounding differences
+    # between runs have been observed.
     rel_tol = 1e-3 if sys.platform in ("darwin", "win32") else 1e-09
 
-    for d_line, c_line in zip(direct_lines, cli_lines):
+    for d_line, c_line in zip(direct_lines, cli_lines, strict=True):
         helpers.assert_embedded_isclose(d_line, c_line, rel_tol=rel_tol)
 
 

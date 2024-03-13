@@ -54,8 +54,8 @@ class SixSTarget(NamedTuple):
 
     archive_urls: list[str]
     """
-    URL(s) to obtain 6S source archive from. 
-    
+    URL(s) to obtain 6S source archive from.
+
     To avoid downloading a new copy, configure a cache directory using SIXS_ARCHIVE_DIR.
     """
 
@@ -205,7 +205,7 @@ def _resolve_source(
             f"Expected SHA256={target.archive_sha256}, got SHA256={digest}"
         )
 
-    logger.info(f"Extracting source...")
+    logger.info("Extracting source...")
     logger.debug("Extracting %d byte payload to '%s'", len(sixs_source), directory)
     buffer = io.BytesIO(sixs_source)
     tar_file = tarfile.open(fileobj=buffer, mode="r:")
@@ -215,7 +215,7 @@ def _resolve_source(
 def _install(binary: pathlib.Path, target: pathlib.Path) -> None:
     shutil.copyfile(binary, target)
     # Make sure file has owner execute permissions.
-    os.chmod(target, target.stat().st_mode | stat.S_IXUSR)
+    target.chmod(target.stat().st_mode | stat.S_IXUSR)
 
 
 def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> None:
@@ -226,21 +226,22 @@ def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> N
     )
 
     binary_dest = PACKAGE_ROOT.joinpath(target.target_name)
-    logger.debug(f"destination for %s is '%s'", target.target_name, binary_dest)
+    logger.debug("destination for %s is '%s'", target.target_name, binary_dest)
 
     if binary_dest.is_file():
         # Binary already exists in package. Skip rebuilding.
         logger.info(f"target {binary_dest} already exists - skipping build")
         return
 
-    logger.info(f"Resolving 6S source...")
+    logger.info("Resolving 6S source...")
     _resolve_source(target, build_dir, config.archive_dir)
     logger.debug("source contents: %r", sorted(build_dir.glob("**/*")))
 
     # Make 6S executable.
     logger.info("Building...")
     try:
-        # If 6S source contains a directory beginning with 6S, build from that directory.
+        # If 6S source contains a directory beginning with "6S", build
+        # from that directory.
         (src_dir,) = build_dir.glob("6S*")
     except (FileNotFoundError, ValueError):
         # No 6S* subdirectory. Build from source root.
@@ -252,7 +253,10 @@ def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> N
 
     fc_override = config.fc_override
     if fc_override is None:
-        fc_override = "FC=gfortran -std=legacy -ffixed-line-length-none -ffpe-summary=none $(FFLAGS)"
+        fc_override = (
+            "FC=gfortran -std=legacy -ffixed-line-length-none"
+            " -ffpe-summary=none $(FFLAGS)"
+        )
     if config.fc_append is not None:
         fc_override += f" {config.fc_append}"
 
@@ -268,7 +272,9 @@ def build(target: SixSTarget, build_dir: pathlib.Path, config: BuildConfig) -> N
         )
     except subprocess.CalledProcessError as ex:
         raise BuildError(
-            f"make exited with non-zero exit status {ex.returncode}\nstdout:\n{ex.stdout}\nstderr:\n{ex.stderr}",
+            f"make exited with non-zero exit status {ex.returncode}"
+            f"\nstdout:\n{ex.stdout}"
+            f"\nstderr:\n{ex.stderr}",
         ) from ex
     logger.debug("make output\nstdout:\n%s\nstderr:\n%s", result.stdout, result.stderr)
 
@@ -318,7 +324,7 @@ def main() -> None:
 
     _setup_logging(config.log_file)
     logger = logging.getLogger(__name__)
-    logger.info(f"Building from '%s' with config %r", pathlib.Path.cwd(), config)
+    logger.info("Building from '%s' with config %r", pathlib.Path.cwd(), config)
 
     # Check system dependencies
     logger.info("Checking system dependencies...")

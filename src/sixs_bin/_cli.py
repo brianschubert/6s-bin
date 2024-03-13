@@ -40,14 +40,17 @@ def _make_parser() -> argparse.ArgumentParser:
     command_group.add_argument(
         "--path",
         choices=sixs_bin._SIXS_BINARIES.keys(),
-        help="Print the path to the specified 6S executable from this package's resources.",
+        help="Print the path to the specified 6S executable from this"
+        "  package's resources.",
     )
     command_group.add_argument(
         "--exec",
         choices=sixs_bin._SIXS_BINARIES.keys(),
-        help="Execute specified 6S executable in a subprocess, inheriting stdin and stdout. This option is provided"
-        " as a convenience, but its not generally recommended. Running 6S using this option is around 5%% slower than"
-        " executing the binary directly, due the overhead of starting the Python interpreter and subprocess.",
+        help="Execute specified 6S executable in a subprocess, inheriting stdin and"
+        " stdout. This option is provided as a convenience, but its not generally"
+        " recommended. Running 6S using this option is around 5%% slower than executing"
+        " the binary directly, due the overhead of starting the Python interpreter and"
+        " subprocess.",
     )
     command_group.add_argument(
         "--test-wrapper",
@@ -60,7 +63,10 @@ def _make_parser() -> argparse.ArgumentParser:
 
 def _make_version() -> str:
     """Create version summary."""
-    return f"{sixs_bin.DISTRIBUTION_NAME} {sixs_bin.__version__} (6S {', '.join(sixs_bin._SIXS_BINARIES.keys())})"
+    return (
+        f"{sixs_bin.DISTRIBUTION_NAME} {sixs_bin.__version__}"
+        f" (6S {', '.join(sixs_bin._SIXS_BINARIES.keys())})"
+    )
 
 
 def main(cli_args: list[str]) -> None:

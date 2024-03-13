@@ -79,3 +79,84 @@ files = ["src"]
 [[tool.mypy.overrides]]
 module = "Py6S.*"
 ignore_missing_imports = true
+
+# ruff config.
+[tool.ruff]
+line-length = 88  # match black
+target-version = "py39"
+fix = true
+src = ["src"]
+
+# ruff lint settings.
+[tool.ruff.lint]
+# Select active lint rules.
+# https://docs.astral.sh/ruff/rules/
+select = [
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E", "W",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pyupgrade
+    "UP",
+    # flake8-2020
+    "YTT",
+    # flake-8-blind-except
+    "BLE",
+    # flake8-boolean-trap
+    "FBT",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-executable
+    "EXE",
+    # flake8-future-annotations
+    "FA",
+    # flake8-import-conventions
+    "ICN",
+    # flake8-pie
+    "PIE",
+    # flake8-pyi
+    "PYI",
+    # flake8-pytest-style
+    "PT",
+    # flake8-quotes
+    "Q",
+    # flake8-return
+    "RET",
+    # flake8-simplify
+    "SIM",
+    # flake8-tidy-imports
+    "TID",
+    # flake8-type-checking
+    "TCH",
+    # flake8-unused-arguments
+    "ARG",
+    # flake8-use-pathlib
+    "PTH",
+    # pylint
+    "PL",
+    # flynt
+    "FLY",
+    # NumPy-specific rules
+    "NPY",
+    # Perflint
+    "PERF",
+    # Ruff-specific rules
+    "RUF",
+]
+
+unfixable = [
+    # Unused noqa
+    "RUF100",
+    # Unused import
+    "F401",
+]
