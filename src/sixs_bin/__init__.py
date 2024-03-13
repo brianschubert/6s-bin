@@ -20,13 +20,14 @@ from __future__ import annotations
 import importlib.metadata
 import importlib.resources
 import pathlib
-from typing import TYPE_CHECKING, Final, Literal, TypeAlias
+from typing import TYPE_CHECKING, Final, Literal
 
 # Py6S may not be installed.
 if TYPE_CHECKING:
     from importlib.abc import Traversable
 
     from Py6S import SixS
+    from typing_extensions import TypeAlias
 
 SixSVersion: TypeAlias = Literal["1.1", "2.1"]
 

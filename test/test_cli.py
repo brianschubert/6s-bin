@@ -82,7 +82,7 @@ def test_exec_matches(sixs_version, manual_input_file, helpers) -> None:
     # between runs have been observed.
     rel_tol = 1e-3 if sys.platform in ("darwin", "win32") else 1e-09
 
-    for d_line, c_line in zip(direct_lines, cli_lines, strict=True):
+    for d_line, c_line in zip(direct_lines, cli_lines):
         helpers.assert_embedded_isclose(d_line, c_line, rel_tol=rel_tol)
 
 
