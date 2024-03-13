@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Retrieve 6S source archives
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: 6s-archives
           path: 6s-archives
