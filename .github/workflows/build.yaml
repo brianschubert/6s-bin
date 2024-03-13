@@ -61,13 +61,13 @@ jobs:
           SIXS_FC_APPEND: ${{ contains(matrix.os, 'windows') && '-static' || null }}
           SIXS_BUILD_LOG: ${{ github.workspace }}/${{ matrix.os }}-buildpy.log
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist-build
           path: dist
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: buildpy-logs
           path: ${{ matrix.os }}-buildpy.log
@@ -93,7 +93,7 @@ jobs:
           python -m pip install --upgrade wheel
           python -m wheel tags --remove --python-tag=py3 --abi-tag=none ./dist/*.whl
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist-release
           path: dist
