@@ -30,7 +30,7 @@ jobs:
         os: [ "windows-latest", "ubuntu-latest", "macos-latest" ]
         python-version: [ "3.9", "3.10", "3.11", "3.12" ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Retrieve 6S source archives
         uses: actions/download-artifact@v3

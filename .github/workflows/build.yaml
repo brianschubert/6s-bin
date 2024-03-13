@@ -29,7 +29,7 @@ jobs:
           - os: ubuntu-latest
             sdist: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -144,7 +144,7 @@ jobs:
           Write-Host $output
           exit [int]$($output -notmatch 'Requirement already satisfied: 6s-bin')
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           sparse-checkout: test
 
