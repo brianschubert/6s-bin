@@ -41,6 +41,7 @@ ruff = "^0.3.2"
 mypy = "^1.4.0"
 pytest = "^7.4.0"
 py6s = "^1.9.2"
+pre-commit = "^3.6.2"
 
 [tool.poetry.extras]
 wrapper = ["py6s", "python-dateutil"]
@@ -68,6 +69,12 @@ profile = "black"
 # mypy config.
 [tool.mypy]
 strict = true
+# Controls which files mypy should type-checked when no files are specified on the
+# command line.
+# Specified as files (instead of as a package) so that this works inside the mypy
+# pre-commit hook (where this project won't be installed in the same enviroment that
+# mypy is running in).
+files = ["src"]
 
 [[tool.mypy.overrides]]
 module = "Py6S.*"
