@@ -46,8 +46,9 @@ jobs:
       - name: Retrieve 6S source archives
         uses: actions/download-artifact@v4
         with:
-          name: 6s-archives
+          pattern: 6s-archives-*
           path: 6s-archives
+          merge-multiple: true
 
       # Only build source distribution in a single job.
       # In the job that builds the source distribution, call 'build' with no arguments so that it builds the wheel
@@ -63,13 +64,13 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-build
+          name: dist-build-${{ matrix.os }}
           path: dist
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
-          name: buildpy-logs
+          name: buildpy-logs-${{ matrix.os }}
           path: ${{ matrix.os }}-buildpy.log
           if-no-files-found: error
 
@@ -79,8 +80,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: dist-build
+          pattern: dist-build-*
           path: dist
+          merge-multiple: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -95,7 +97,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-release
+          name: dist-release-${{ matrix.os }}
           path: dist
           if-no-files-found: error
 
@@ -116,8 +118,9 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: dist-release
+          pattern: dist-release-*
           path: dist
+          merge-multiple: true
 
       # Makes sure that the installed distribution is from the wheels that were just built and not downloaded from PyPI.
       #   --no-index    - only search './dist' (not PyPI)

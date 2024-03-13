@@ -29,8 +29,9 @@ jobs:
       - name: Retrieve distributions
         uses: actions/download-artifact@v4
         with:
-          name: dist-release
+          pattern: dist-release-*
           path: dist
+          merge-multiple: true
 
        # Verify that the version tag on all distribution files matches the pushed tag.
       - name: Check version consistency
@@ -137,8 +138,9 @@ jobs:
       - name: Retrieve distributions
         uses: actions/download-artifact@v4
         with:
-          name: dist-release
+          pattern: dist-release-*
           path: dist
+          merge-multiple: true
 
       - name: Publish distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
