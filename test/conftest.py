@@ -64,7 +64,7 @@ class Helpers:
             f" numbers ({len(embedded_s1)} vs {len(embedded_s2)})"
         )
 
-        for left_num, right_num in zip(embedded_s1, embedded_s2, strict=False):
+        for left_num, right_num in zip(embedded_s1, embedded_s2):
             assert math.isclose(left_num, right_num, **kwargs), (
                 "embedded numbers do not agree within tolerance between"
                 f" strings {s1=!r} and {s2=!r}"
